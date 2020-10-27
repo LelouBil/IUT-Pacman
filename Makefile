@@ -14,16 +14,16 @@ VERBOSE = TRUE
 all: $(OUTPUT)
 
 clean: 
-	$(RM) $(OUTPUT) $(OBJDIR)/*.o $(LIBGRDIR)/*.o 
+	$(RM) $(OUTPUT) $(OBJDIR)/*.o $(LIBGRDIR)/*.o
 
 $(OUTPUT): $(LIBGRDIR)/libgraphique.o $(OBJ)
-	gcc $^  -o $(OUTPUT)  $(SDL_CFLAGS) $(SDL_LDFLAGS) $(LIB)
+	gcc $^  -o $(OUTPUT)  $(SDL_CFLAGS) $(SDL_LDFLAGS) $(LIB) -ggdb
 
 $(LIBGRDIR)/libgraphique.o: $(LIBGRDIR)/libgraphique.c
-	gcc   -c $(LIBGRDIR)/libgraphique.c -o $(LIBGRDIR)/libgraphique.o 
+	gcc   -c $(LIBGRDIR)/libgraphique.c -o $(LIBGRDIR)/libgraphique.o  -ggdb
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
-	gcc $(OPT) -c $<  -o $@
+	gcc $(OPT) -c $<  -o $@ -ggdb
 
 
 
