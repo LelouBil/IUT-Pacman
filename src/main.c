@@ -2,6 +2,7 @@
 #include "display.h"
 
 
+
 void game_loop();
 
 Partie load_game_data(char *const plan_file) {
@@ -68,6 +69,8 @@ void game_loop(Partie *partie) {
         }
 
         actualiser();
+
+        attente(framerate);
 
         reinitialiser_evenements();
 
