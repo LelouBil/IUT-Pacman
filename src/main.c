@@ -2,7 +2,27 @@
 /* MAIN.c                                                                     */
 /******************************************************************************/
 #include "./main.h"
+#include "../lib/libgraphique.h"
 
+//definition de variables
+#define PLATEAU_BLOCK_TAILLE 32
+
+#define PACMAN_VITESSE 4
+
+typedef struct pacman{
+	Point pos;
+	int vie;
+}Pacman;
+
+/******************************************************************************/
+/* Fonctions graphiques						                                  */
+/******************************************************************************/
+    
+
+void dessiner_plateau(Partie p);
+void dessiner_pacman(Pacman p);
+
+Pacman pacman_initialisation(Partie p);
 
 /******************************************************************************/
 /* MAIN                                                                       */
@@ -43,7 +63,78 @@ int main(int argc, char **argv)
 /******************************************************************************/
 /* A PARTIR D'ICI...C'EST A VOUS DE JOUER!                                    */
 /******************************************************************************/
+    
+    ouvrir_fenetre(p.C * PLATEAU_BLOCK_TAILLE,p.L * PLATEAU_BLOCK_TAILLE);
+    int EXIT_FLAG = 0;
+    Point curseur;
+    
+    Pacman pac = pacman_initialisation(p);
+    
+    //while(!EXIT_FLAG){
+		int evenement = attendre_touche_duree(30);
+		
+		if(evenement == SDLK_RIGHT){
+			pac.pos.x += PACMAN_VITESSE;
+		}
+		
+		if(evenement == SDLK_DOWN){
+			EXIT_FLAG = 1;
+		}
+		
+		curseur.x = 0;
+		curseur.y = 0;
+		dessiner_rectangle(curseur,p.C * PLATEAU_BLOCK_TAILLE,p.L * PLATEAU_BLOCK_TAILLE,black);
+		dessiner_plateau(p);
+		dessiner_pacman(pac);
+		
+	//}
+    
+	actualiser();
+    
+    attendre_clic();
+    fermer_fenetre();
     return 0;
     }
+    
+    
+    
 
+void dessiner_plateau(Partie p){
+//Parcour tout le tableau du plateau et dessine un rectangle pour chaque character '*'    
+    Point curseur;
+    
+    for(int i=0;i<p.L;i++){
+		for(int j=0;j<p.C;j++){
+			if(p.plateau[i][j] == '*'){
+				curseur.x = j * 32;
+				curseur.y = i * 32;
+				
+				dessiner_rectangle(curseur,PLATEAU_BLOCK_TAILLE,PLATEAU_BLOCK_TAILLE,blue);
+				}
+			}
+		}
+	}
 
+void dessiner_pacman(Pacman p){
+//Dessine pacman selon sa position
+	dessiner_cercle(p.pos,PLATEAU_BLOCK_TAILLE,yellow);
+	}
+	
+Pacman pacman_initialisation(Partie p){
+//Initialise pacman    
+	Pacman pac;
+	
+    for(int i=0;i<p.L;i++){
+		for(int j=0;j<p.C;j++){
+			if(p.plateau[i][j] == 'P'){
+				pac.pos.x = i * 32;
+				pac.pos.y = j * 32;
+				return pac;
+				}
+			}
+		}
+	printf("Structure de Plateau Invalide : pas de Debut pour Pacman (P)");
+	pac.pos.x = 0;
+	pac.pos.y = 0;
+	return pac;
+	}
