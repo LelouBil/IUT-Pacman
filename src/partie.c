@@ -161,9 +161,6 @@ Partie convert_partie(Char_Partie charPartie) {
     }
 
 
-    partie_data.case_pacman = &partie_data.plateau[charPartie.pacman.x][charPartie.pacman.y];
-
-    partie_data.case_pacman->type_entity = ENTITY_PACMAN;
 
     int fantome_name = ENTITY_BLINKY;
 

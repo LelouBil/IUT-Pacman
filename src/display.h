@@ -3,8 +3,6 @@
 #include "../lib/libgraphique.h"
 #include "./partie.h"
 
-#define PLATEAU_BLOCK_TAILLE 32
-
 //region colors
 #define COLOR_WALL blue
 #define COLOR_BG black

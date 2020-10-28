@@ -5,6 +5,11 @@
 #include <stdlib.h>
 
 //region Defines
+
+//region plateau
+#define PLATEAU_BLOCK_TAILLE 32
+//endregion
+
 //region Entities Types
 #define ENTITY_EMPTY 0
 #define ENTITY_PACMAN 1
@@ -20,7 +25,9 @@
 #define GOMME_BONUS 2
 //endregion
 
+//region jeu
 #define NBFANTOMES  1 // nombres de fantômes dans les plateaux chargés
+#define VIE_MAX 3
 //endregion
 
 //region STRUCTURES
@@ -54,12 +61,19 @@ typedef struct {
     int type_entity; // 0 rien, 1 pacman, 2 3 4 5 fantomes
 } Case;
 
+// pacman
+typedef struct {
+	Case *case_pacman;
+	Pos position; //pos EN PIXEL
+} Pacman;
+//endregion
+
 // Une partie
 typedef struct {
     Case **plateau;
     int xmax;
     int ymax;
-    Case *case_pacman;
+    Pacman pacman;
     Case *cases_fantomes[NBFANTOMES];
 
     int gomme_restant;
