@@ -1,6 +1,7 @@
 #include "./main.h"
 #include "display.h"
-
+#include "timings.h"
+#include "gameplay.h"
 
 
 void game_loop();
@@ -67,6 +68,10 @@ void game_loop(Partie *partie) {
         if (touche_a_ete_pressee(SDLK_ESCAPE)) {
             EXIT_FLAG = 1;
         }
+
+        key_events(partie);
+
+        printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
 
         actualiser();
 

@@ -16,5 +16,11 @@ static const int COLOR_FANTOMES[NBFANTOMES] = {pink};
 void dessiner_plateau(const Partie *p);
 
 void dessiner_case(const Case *p);
+
+void dessiner_pacman(const Pacman *p);
+
+void dessiner_fantome(const Fantome *f);
+
+void dessiner_rect_cases(const Partie *p, int cx, int cy);
 //endregion
 

@@ -2,7 +2,8 @@
 
 #include "partie.h"
 
-#define VITESSE_PACMAN 4
+
+#define PACMAN_SPEED 1.0 // 1 case par seconde
 
 #define DIR_HAUT 0
 #define DIR_DROITE 1
@@ -11,3 +12,5 @@
 
 static const int VITESSE_FANTOME[NBFANTOMES] = {4};
 
+
+void key_events(Partie *partie);

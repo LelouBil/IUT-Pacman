@@ -10,13 +10,11 @@
 #define PLATEAU_BLOCK_TAILLE 32
 //endregion
 
-//region Entities Types
-#define ENTITY_EMPTY 0
-#define ENTITY_PACMAN 1
-#define ENTITY_BLINKY 2
-#define ENTITY_PINKY 3
-#define ENTITY_INKY 4
-#define ENTITY_CLYDE 5
+//region Fantome Types
+#define FANTOME_BLINKY 2
+#define FANTOME_PINKY 3
+#define FANTOME_INKY 4
+#define FANTOME_CLYDE 5
 //endregion
 
 //region Gomme types
@@ -58,15 +56,22 @@ typedef struct {
     int x, y;
     int wall;
     int type_gomme; // 0 rien, 1 pac gomme, 2 bonus
-    int type_entity; // 0 rien, 1 pacman, 2 3 4 5 fantomes
 } Case;
 
 // pacman
 typedef struct {
-	Case *case_pacman;
-	Pos position; //pos EN PIXEL
+    Case *case_pacman;
+    int direction;
+    Pos position; //pos EN PIXEL
 } Pacman;
 //endregion
+
+typedef struct {
+    Case *case_fantome;
+    int direction;
+    Pos position;
+    int type_fantome;
+} Fantome;
 
 // Une partie
 typedef struct {
@@ -74,7 +79,7 @@ typedef struct {
     int xmax;
     int ymax;
     Pacman pacman;
-    Case *cases_fantomes[NBFANTOMES];
+    Fantome fantomes[NBFANTOMES];
 
     int gomme_restant;
 } Partie;

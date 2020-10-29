@@ -1,5 +1,6 @@
 #include "./partie.h"
-
+#include "utils.h"
+#include "utils.h"
 
 Partie charge_plan(char *fichier) {
     Char_Partie p;
@@ -156,20 +157,22 @@ Partie convert_partie(Char_Partie charPartie) {
     for (int x = 0; x < partie_data.xmax; ++x) {
         partie_data.plateau[x] = calloc(partie_data.ymax, sizeof(Case));
         for (int y = 0; y < partie_data.ymax; ++y) {
-            partie_data.plateau[x][y] = (Case) {x, y, charPartie.plateau[y][x] == '*', 0, 0};
+            partie_data.plateau[x][y] = (Case) {x, y, charPartie.plateau[y][x] == '*', 0};
         }
     }
 
 
-
-    int fantome_name = ENTITY_BLINKY;
+    int fantome_name = FANTOME_BLINKY;
 
     for (int i = 0; i < NBFANTOMES; ++i) {
         Pos fantome_pos = charPartie.fantomes[i];
-        partie_data.cases_fantomes[i] = &partie_data.plateau[fantome_pos.x][fantome_pos.y];
-        partie_data.cases_fantomes[i]->type_entity = fantome_name;
+        Case *c = &partie_data.plateau[fantome_pos.x][fantome_pos.y];
+        partie_data.fantomes[i] = (Fantome) {c, 0, get_case_center(c), fantome_name};
         fantome_name++;
     }
+
+    partie_data.pacman.case_pacman = &partie_data.plateau[charPartie.pacman.y][charPartie.pacman.x];
+    partie_data.pacman.position = get_case_center(partie_data.pacman.case_pacman);
 
     //libération de l'ancienne struct partie
 
