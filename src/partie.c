@@ -173,6 +173,7 @@ Partie convert_partie(Char_Partie charPartie) {
 
     partie_data.pacman.case_pacman = &partie_data.plateau[charPartie.pacman.y][charPartie.pacman.x];
     partie_data.pacman.position = get_case_center(partie_data.pacman.case_pacman);
+    partie_data.pacman.direction = DIR_HAUT;
 
     //libération de l'ancienne struct partie
 
