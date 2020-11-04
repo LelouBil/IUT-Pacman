@@ -63,6 +63,7 @@ typedef struct {
     Case *case_pacman;
     int direction;
     Pos position; //pos EN PIXEL
+    int oob;
 } Pacman;
 //endregion
 

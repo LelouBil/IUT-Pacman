@@ -14,7 +14,7 @@ void dessiner_fantome(const Fantome *c) {
 
 void dessiner_pacman(const Pacman *p) {
     //Dessine pacman selon sa position
-    dessiner_disque(to_point(p->position), PLATEAU_BLOCK_TAILLE / 2, yellow);
+    dessiner_disque(to_point(p->position), (PLATEAU_BLOCK_TAILLE / 2) - 1, yellow);
 }
 
 void dessiner_gomme_pac(const Case *c) {
@@ -70,7 +70,7 @@ void dessiner_case(const Case *c) {
 void dessiner_rect_cases(const Partie *p, int cx, int cy) {
     for (int x = cx - 1; x < cx + 2; ++x) {
         for (int y = cy - 1; y < cy + 2; ++y) {
-            if (x > 0 && x < p->xmax && y > 0 && y < p->ymax) {
+            if (x >= 0 && x < p->xmax && y >= 0 && y < p->ymax) {
                 dessiner_case(&p->plateau[x][y]);
             }
         }

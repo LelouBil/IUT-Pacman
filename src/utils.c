@@ -11,13 +11,13 @@ Case *get_case_at(const Partie *partie, const Case *c, int direction) {
             if (c->x - 1 < 0) return NULL;
             return &partie->plateau[c->x - 1][c->y];
         case DIR_DROITE:
-            if (c->x + 1 > partie->xmax) return NULL;
+            if (c->x + 1 >= partie->xmax) return NULL;
             return &partie->plateau[c->x + 1][c->y];
         case DIR_HAUT:
             if (c->y - 1 < 0) return NULL;
             return &partie->plateau[c->x][c->y - 1];
         case DIR_BAS:
-            if (c->y + 1 > partie->ymax) return NULL;
+            if (c->y + 1 >= partie->ymax) return NULL;
             return &partie->plateau[c->x][c->y + 1];
         default:
             return NULL;

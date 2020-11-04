@@ -78,29 +78,84 @@ void pacman_deplace(Partie *partie) {
         int dir = dir_from_key(key);
         if (touche_a_ete_pressee(key)) {
             Case *target = get_case_at(partie, pacman->case_pacman, dir);
-            if (pacman_aligned_dir(pacman, dir) && target->wall ==
-                                                   0) //on autorise le changement de direction si pacman est aligné avec cette colonne/ligneet si il n'y a pas de mur a cet endroit
+            if (target != NULL && pacman_aligned_dir(pacman, dir) && target->wall ==
+                                                                     0) //on autorise le changement de direction si pacman est aligné avec cette colonne/ligneet si il n'y a pas de mur a cet endroit
                 pacman->direction = dir;
         }
     }
 
-    Case *target = get_case_at(partie, pacman->case_pacman, pacman->direction);
+    if (!pacman->oob) {
+        Case *target = get_case_at(partie, pacman->case_pacman, pacman->direction);
 
-    if (!target->wall || !pacman_aligned_dir(pacman, get_perp(
-            pacman->direction))) { // on continue d'avancer si pacman n'as pas touché de mur OU si il n'est pas encore aligné sur la direction dans laquelle il avance
-        pacman_do_move(partie, pacman->direction);
+        if ((target == NULL || !target->wall) || !pacman_aligned_dir(pacman, get_perp(
+                pacman->direction))) { // on continue d'avancer si pacman n'as pas touché de mur OU si il n'est pas encore aligné sur la direction dans laquelle il avance
+            pacman_do_move(partie, pacman->direction);
+        } else {
+
+        }
     } else {
-
+        pacman_do_move(partie, pacman->direction);
     }
+
 
     Pos p = partie->pacman.position;
 
     int cx = p.x / PLATEAU_BLOCK_TAILLE;
     int cy = p.y / PLATEAU_BLOCK_TAILLE;
 
+    if (cx >= 0 && cx < partie->xmax && cy >= 0 && cy < partie->ymax) {
+        pacman->oob = 0;
+    } else {
+        pacman->oob = 1;
+    }
+
+
+    int tunnel = 0;
+
+    if (cx > partie->xmax) {
+        cx = 0;
+        tunnel = 1;
+    } else if (cx < 0) {
+        cx = partie->xmax - 1;
+        tunnel = 1;
+    }
+
+    if (cy > partie->ymax) {
+        cy = 0;
+        tunnel = 1;
+    } else if (cy < 0) {
+        cy = partie->ymax - 1;
+        tunnel = 1;
+    }
+//
+//
+//    if(cx == 0){
+//        dessiner_case(&partie->plateau[partie->xmax - 1][cy]);
+//    }
+//
+//    if(cx == partie->xmax - 1){
+//        dessiner_case(&partie->plateau[0][cy]);
+//    }
+//
+//    if(cy == 0){
+//        dessiner_case(&partie->plateau[cx][partie->ymax - 1]);
+//    }
+//
+//    if(cy == partie->ymax - 1){
+//        dessiner_case(&partie->plateau[cx][0]);
+//    }
+
+
+    if (tunnel) {
+
+        partie->pacman.position = get_case_center(&partie->plateau[cx][cy]);
+    }
+
 
     partie->pacman.case_pacman = &partie->plateau[cx][cy];
+
     dessiner_rect_cases(partie, cx, cy);
+
     dessiner_pacman(&partie->pacman);
 
 }

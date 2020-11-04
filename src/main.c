@@ -71,7 +71,7 @@ void game_loop(Partie *partie) {
 
         key_events(partie);
 
-        printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
+        //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
 
         actualiser();
 
