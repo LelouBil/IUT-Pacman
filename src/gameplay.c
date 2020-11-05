@@ -78,8 +78,8 @@ void pacman_deplace(Partie *partie) {
         int dir = dir_from_key(key);
         if (touche_a_ete_pressee(key)) {
             Case *target = get_case_at(partie, pacman->case_pacman, dir);
-            if (target != NULL && pacman_aligned_dir(pacman, dir) && target->wall ==
-                                                                     0) //on autorise le changement de direction si pacman est aligné avec cette colonne/ligneet si il n'y a pas de mur a cet endroit
+            if ((target == NULL) || (pacman_aligned_dir(pacman, dir) && target->wall ==
+                                                                        0)) //on autorise le changement de direction si pacman est aligné avec cette colonne/ligneet si il n'y a pas de mur a cet endroit
                 pacman->direction = dir;
         }
     }
@@ -113,49 +113,32 @@ void pacman_deplace(Partie *partie) {
     int tunnel = 0;
 
     if (cx > partie->xmax) {
-        cx = 0;
+        cx = -1;
         tunnel = 1;
     } else if (cx < 0) {
-        cx = partie->xmax - 1;
+        cx = partie->xmax;
         tunnel = 1;
     }
 
     if (cy > partie->ymax) {
-        cy = 0;
+        cy = -1;
         tunnel = 1;
     } else if (cy < 0) {
-        cy = partie->ymax - 1;
+        cy = partie->ymax;
         tunnel = 1;
     }
-//
-//
-//    if(cx == 0){
-//        dessiner_case(&partie->plateau[partie->xmax - 1][cy]);
-//    }
-//
-//    if(cx == partie->xmax - 1){
-//        dessiner_case(&partie->plateau[0][cy]);
-//    }
-//
-//    if(cy == 0){
-//        dessiner_case(&partie->plateau[cx][partie->ymax - 1]);
-//    }
-//
-//    if(cy == partie->ymax - 1){
-//        dessiner_case(&partie->plateau[cx][0]);
-//    }
 
 
     if (tunnel) {
 
-        partie->pacman.position = get_case_center(&partie->plateau[cx][cy]);
+        partie->pacman.position = (Pos) {cx * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2,
+                                         cy * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2};
     }
 
-
-    partie->pacman.case_pacman = &partie->plateau[cx][cy];
-
+    if (!pacman->oob) {
+        partie->pacman.case_pacman = &partie->plateau[cx][cy];
+    }
     dessiner_rect_cases(partie, cx, cy);
-
     dessiner_pacman(&partie->pacman);
 
 }
