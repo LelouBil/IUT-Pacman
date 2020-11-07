@@ -105,6 +105,7 @@ Partie charge_plan(char *fichier) {
                 }
                 p.fantomes[nbf].x = l;
                 p.fantomes[nbf].y = c;
+
                 nbf++;
             } else if (ch == 'B')
                 nbb++;

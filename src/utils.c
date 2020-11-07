@@ -1,3 +1,6 @@
+#include "display.h"
+#include "timings.h"
+#include "./gameplay.h"
 #include "utils.h"
 
 
@@ -31,4 +34,19 @@ Pos get_case_center(const Case *c) {
 
 Point to_point(Pos p) {
     return (Point) {p.x, p.y};
+}
+
+Pos dir_to_vector(int key) {
+    switch (key) {
+        case DIR_HAUT:
+            return (Pos) {0, -1};
+        case DIR_BAS:
+            return (Pos) {0, 1};
+        case DIR_DROITE:
+            return (Pos) {1, 0};
+        case DIR_GAUCHE:
+            return (Pos) {-1, 0};
+        default:
+            return (Pos) {0, 0};
+    }
 }

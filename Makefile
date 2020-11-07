@@ -27,6 +27,3 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
 
 
 
-
-
-

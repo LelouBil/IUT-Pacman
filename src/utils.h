@@ -13,4 +13,6 @@ Case *get_case_at(const Partie *partie, const Case *c, int direction);
 Pos get_case_center(const Case *c);
 
 Point to_point(Pos p);
+
+Pos dir_to_vector(int key);
 //endregion
