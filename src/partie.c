@@ -147,6 +147,7 @@ Partie convert_partie(Char_Partie charPartie) {
 
     partie_data.xmax = charPartie.C;
     partie_data.ymax = charPartie.L;
+    partie_data.gomme_restant = 0;
 
     partie_data.plateau = calloc(partie_data.xmax, sizeof(Case *));
 
@@ -157,7 +158,12 @@ Partie convert_partie(Char_Partie charPartie) {
     for (int x = 0; x < partie_data.xmax; ++x) {
         partie_data.plateau[x] = calloc(partie_data.ymax, sizeof(Case));
         for (int y = 0; y < partie_data.ymax; ++y) {
-            partie_data.plateau[x][y] = (Case) {x, y, charPartie.plateau[y][x] == '*', 0};
+            int gomme = GOMME_EMPTY;
+            if (charPartie.plateau[y][x] == '.') {
+                gomme = GOMME_PAC;
+                partie_data.gomme_restant++;
+            } else { if (charPartie.plateau[y][x] == 'B') gomme = GOMME_BONUS; }
+            partie_data.plateau[x][y] = (Case) {x, y, charPartie.plateau[y][x] == '*', gomme};
         }
     }
 

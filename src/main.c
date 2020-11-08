@@ -2,6 +2,7 @@
 #include "display.h"
 #include "timings.h"
 #include "gameplay.h"
+#include "collisions.h"
 
 
 void game_loop();
@@ -70,6 +71,8 @@ void game_loop(Partie *partie) {
         }
 
         key_events(partie);
+
+        check_collisions(partie);
 
         //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
 
