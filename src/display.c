@@ -8,21 +8,21 @@ void remplir_case(const Case *c, int color) {
     dessiner_rectangle(get_point(c), PLATEAU_BLOCK_TAILLE, PLATEAU_BLOCK_TAILLE, color);
 }
 
-void dessiner_fantome(const Fantome *c) {
-    //todo
+void dessiner_fantome(const Fantome *f) {
+    dessiner_disque(to_point(get_case_center(f->case_fantome)), SIZE_FANTOME, COLOR_FANTOMES[(f->type_fantome - 2)]);
 }
 
 void dessiner_pacman(const Pacman *p) {
     //Dessine pacman selon sa position
-    dessiner_disque(to_point(p->position), (PLATEAU_BLOCK_TAILLE / 2) - 1, yellow);
+    dessiner_disque(to_point(p->position), SIZE_PACMAN, yellow);
 }
 
 void dessiner_gomme_pac(const Case *c) {
-    //todo
+    dessiner_disque(to_point(get_case_center(c)), SIZE_GOMME_PAC, COLOR_GOMME);
 }
 
 void dessiner_gomme_bonus(const Case *c) {
-    //todo
+    dessiner_disque(to_point(get_case_center(c)), SIZE_GOMME_BONUS, COLOR_GOMME);
 }
 
 //endregion

@@ -9,7 +9,16 @@
 #define COLOR_PACMAN yellow
 #define COLOR_GOMME yellow
 #define COLOR_BONUS yellow
-static const int COLOR_FANTOMES[NBFANTOMES] = {pink};
+static const int COLOR_FANTOMES[NBFANTOMES] = {red, pink, cyan, orange};
+
+//region Sizes
+#define SIZE_GOMME_BONUS ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.5)
+#define SIZE_GOMME_PAC ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.2)
+#define SIZE_FANTOME ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.8)
+#define SIZE_PACMAN ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.8)
+
+
+
 
 //region Prototypes
 

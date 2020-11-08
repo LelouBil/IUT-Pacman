@@ -24,7 +24,7 @@
 //endregion
 
 //region jeu
-#define NBFANTOMES  1 // nombres de fantômes dans les plateaux chargés
+#define NBFANTOMES 4 // nombres de fantômes dans les plateaux chargés
 #define VIE_MAX 3
 //endregion
 
@@ -81,7 +81,6 @@ typedef struct {
     int ymax;
     Pacman pacman;
     Fantome fantomes[NBFANTOMES];
-
     int gomme_restant;
 } Partie;
 //endregion
