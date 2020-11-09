@@ -27,6 +27,7 @@ Case *get_case_at(const Partie *partie, const Case *c, int direction) {
     }
 }
 
+
 Pos get_case_center(const Case *c) {
     return (Pos) {c->x * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2,
                   c->y * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2};
