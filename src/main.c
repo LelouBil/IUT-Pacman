@@ -4,6 +4,7 @@
 #include "gameplay.h"
 #include "collisions.h"
 #include "pathfinding.h"
+#include "ai.h"
 
 
 void game_loop();
@@ -75,7 +76,11 @@ void game_loop(Partie *partie) {
 
         key_events(partie);
 
+        fantome_event_manager(partie);
+
         check_collisions(partie);
+
+        dessiner_entities(partie);
 
         //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
 

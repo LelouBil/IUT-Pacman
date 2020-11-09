@@ -52,6 +52,18 @@ Pos dir_to_vector(int key) {
     }
 }
 
-int meme_case(Case* a, Case* b){
+int meme_case(Case *a, Case *b) {
     return (a->y == b->y && a->x == b->x);
+}
+
+int dir_from_to(Case *a, Case *b) {
+    int x = a->x - b->x;
+    int y = a->y - b->y;
+
+    if (x == 0 && y == 0) return -1;
+    if (x == 1 && y == 0) return DIR_GAUCHE;
+    if (x == -1 && y == 0) return DIR_DROITE;
+    if (x == 0 && y == 1) return DIR_HAUT;
+    if (x == 0 && y == -1) return DIR_BAS;
+    return -2;
 }

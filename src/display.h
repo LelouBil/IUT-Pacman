@@ -26,12 +26,14 @@ void dessiner_plateau(const Partie *p);
 
 void dessiner_case(const Case *p);
 
-void dessiner_pacman(const Pacman *p);
-
-void dessiner_fantome(const Fantome *f);
 
 void dessiner_rect_cases(const Partie *p, int cx, int cy);
 
 void dessiner_debug_paththfinding_case(Pos* c,int current_step, int max_step);
+
+void remplir_case(const Case *c, int color);
+
+void dessiner_entities(const Partie *partie);
+
 //endregion
 

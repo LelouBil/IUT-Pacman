@@ -11,10 +11,10 @@
 //endregion
 
 //region Fantome Types
-#define FANTOME_BLINKY 2
-#define FANTOME_PINKY 3
-#define FANTOME_INKY 4
-#define FANTOME_CLYDE 5
+#define FANTOME_BLINKY 0
+#define FANTOME_PINKY 1
+#define FANTOME_INKY 2
+#define FANTOME_CLYDE 3
 //endregion
 
 //region Gomme types

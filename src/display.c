@@ -9,7 +9,7 @@ void remplir_case(const Case *c, int color) {
 }
 
 void dessiner_fantome(const Fantome *f) {
-    dessiner_disque(to_point(get_case_center(f->case_fantome)), SIZE_FANTOME, COLOR_FANTOMES[(f->type_fantome - 2)]);
+    dessiner_disque(to_point(f->position), SIZE_FANTOME, COLOR_FANTOMES[f->type_fantome]);
 }
 
 void dessiner_pacman(const Pacman *p) {
@@ -39,11 +39,7 @@ void dessiner_plateau(const Partie *p) {
         }
     }
 
-    dessiner_pacman(&p->pacman);
 
-    for (int i = 0; i < NBFANTOMES; ++i) {
-        dessiner_fantome(&p->fantomes[i]);
-    }
 }
 
 
@@ -74,5 +70,24 @@ void dessiner_rect_cases(const Partie *p, int cx, int cy) {
                 dessiner_case(&p->plateau[x][y]);
             }
         }
+    }
+}
+
+void dessiner_entities(const Partie *partie){
+
+    dessiner_rect_cases(partie,partie->pacman.case_pacman->x,partie->pacman.case_pacman->y);
+    for (int i = 0; i < NBFANTOMES; ++i) {
+        const Fantome *fantome = &partie->fantomes[i];
+        dessiner_rect_cases(partie,fantome->case_fantome->x,fantome->case_fantome->y);
+    }
+
+
+    dessiner_pacman(&partie->pacman);
+
+
+    for (int i = 0; i < NBFANTOMES; ++i) {
+        const Fantome *fantome = &partie->fantomes[i];
+
+        dessiner_fantome(fantome);
     }
 }

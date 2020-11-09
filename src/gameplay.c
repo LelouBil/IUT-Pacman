@@ -121,9 +121,6 @@ void pacman_deplace(Partie *partie) {
     if (!pacman->oob) {
         partie->pacman.case_pacman = &partie->plateau[cx][cy];
     }
-    dessiner_rect_cases(partie, cx, cy);
-    dessiner_pacman(&partie->pacman);
-
 }
 
 
