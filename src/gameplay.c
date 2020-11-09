@@ -1,7 +1,5 @@
 #include "./gameplay.h"
-#include "utils.h"
-#include "timings.h"
-#include "display.h"
+
 
 #define pacman_px_per_s (PLATEAU_BLOCK_TAILLE * PACMAN_SPEED)
 
@@ -20,21 +18,6 @@ int dir_from_key(int key) {
             return DIR_GAUCHE;
         default:
             return -1;
-    }
-}
-
-Pos dir_to_vector(int key) {
-    switch (key) {
-        case DIR_HAUT:
-            return (Pos) {0, -1};
-        case DIR_BAS:
-            return (Pos) {0, 1};
-        case DIR_DROITE:
-            return (Pos) {1, 0};
-        case DIR_GAUCHE:
-            return (Pos) {-1, 0};
-        default:
-            return (Pos) {0, 0};
     }
 }
 

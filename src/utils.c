@@ -50,3 +50,7 @@ Pos dir_to_vector(int key) {
             return (Pos) {0, 0};
     }
 }
+
+int meme_case(Case* a, Case* b){
+    return (a->y == b->y && a->x == b->x);
+}

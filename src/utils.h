@@ -15,4 +15,6 @@ Pos get_case_center(const Case *c);
 Point to_point(Pos p);
 
 Pos dir_to_vector(int key);
+
+int meme_case(Case* a, Case* b);
 //endregion

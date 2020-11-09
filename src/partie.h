@@ -56,6 +56,7 @@ typedef struct {
     int x, y;
     int wall;
     int type_gomme; // 0 rien, 1 pac gomme, 2 bonus
+    //int pas;
 } Case;
 
 // pacman

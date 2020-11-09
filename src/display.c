@@ -1,4 +1,4 @@
-#include "display.h"
+#include "./display.h"
 
 #include "utils.h"
 
@@ -75,6 +75,19 @@ void dessiner_rect_cases(const Partie *p, int cx, int cy) {
             }
         }
     }
+}
+
+
+void dessiner_debug_paththfinding_case(Case* c,int current_step, int max_step){
+    int gradient_value = (int)((float)current_step/(float)max_step)*255;
+
+    Couleur gradent = fabrique_couleur(gradient_value,gradient_value,gradient_value);
+
+    Point p;
+    p.x = c->x * PLATEAU_BLOCK_TAILLE;
+    p.y = c->y * PLATEAU_BLOCK_TAILLE;
+
+    dessiner_rectangle(p,PLATEAU_BLOCK_TAILLE,PLATEAU_BLOCK_TAILLE,gradent);
 }
 
 

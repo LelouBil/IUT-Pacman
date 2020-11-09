@@ -2,9 +2,6 @@
 
 #include "gameplay.h"
 #include "utils.h"
-#include "../lib/libgraphique.h"
-#include "math.h"
-
 
 int DIR_AVAILABLE[4];
 

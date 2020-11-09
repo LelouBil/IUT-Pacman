@@ -3,6 +3,7 @@
 #include "timings.h"
 #include "gameplay.h"
 #include "collisions.h"
+#include "pathfinding.h"
 
 
 void game_loop();
@@ -53,7 +54,6 @@ int main(int argc, char **argv) {
 
     partie = init_graphique(&partie);
 
-
     game_loop(&partie);
 
 
@@ -64,6 +64,9 @@ int main(int argc, char **argv) {
 void game_loop(Partie *partie) {
     int EXIT_FLAG = 0;
     while (!EXIT_FLAG) {
+
+
+
         traiter_evenements();
 
         if (touche_a_ete_pressee(SDLK_ESCAPE)) {

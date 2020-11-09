@@ -31,5 +31,7 @@ void dessiner_pacman(const Pacman *p);
 void dessiner_fantome(const Fantome *f);
 
 void dessiner_rect_cases(const Partie *p, int cx, int cy);
+
+void dessiner_debug_paththfinding_case(Case* c,int current_step, int max_step);
 //endregion
 

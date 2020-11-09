@@ -1,7 +1,9 @@
 #pragma once
 
 #include "partie.h"
-
+#include "utils.h"
+#include "timings.h"
+#include "display.h"
 
 #define PACMAN_SPEED 1.0 // 1 case par seconde
 
