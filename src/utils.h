@@ -2,13 +2,12 @@
 
 #include "../lib/libgraphique.h"
 #include "partie.h"
-#include "display.h"
-#include "gameplay.h"
+
 
 //region Libgraphique util
 Point get_point(const Case *c);
 
-Case *get_case_at(const Partie *partie, const Case *c, int direction);
+Case *get_case_at(const Partie *partie, const Case *c, direction direction);
 
 Pos get_case_center(const Case *c);
 
@@ -18,5 +17,5 @@ Pos dir_to_vector(int key);
 
 int meme_case(Case* a, Case* b);
 
-int dir_from_to(Case* a, Case* b);
+int dir_from_to(Case *a, Case *b, Partie *p);
 //endregion

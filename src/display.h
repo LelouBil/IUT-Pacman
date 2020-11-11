@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../lib/libgraphique.h"
-#include "./partie.h"
+#include "partie.h"
 
 //region colors
 #define COLOR_WALL blue
@@ -9,6 +9,8 @@
 #define COLOR_PACMAN yellow
 #define COLOR_GOMME yellow
 #define COLOR_BONUS yellow
+
+
 static const int COLOR_FANTOMES[NBFANTOMES] = {red, pink, cyan, orange};
 
 //region Sizes

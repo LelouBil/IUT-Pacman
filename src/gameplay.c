@@ -1,5 +1,6 @@
 #include "./gameplay.h"
-
+#include "utils.h"
+#include "timings.h"
 
 #define pacman_px_per_s (PLATEAU_BLOCK_TAILLE * PACMAN_SPEED)
 
@@ -21,7 +22,7 @@ int dir_from_key(int key) {
     }
 }
 
-int get_perp(int dir) {
+int get_perp(direction dir) {
     switch (dir) {
         case DIR_HAUT:
         case DIR_BAS:
@@ -36,7 +37,7 @@ int get_perp(int dir) {
 }
 
 
-int pacman_aligned_dir(Pacman *pacman, int dir) {
+int pacman_aligned_dir(Pacman *pacman, direction dir) {
     Pos p = get_case_center(pacman->case_pacman);
     switch (dir) {
         case DIR_HAUT:
@@ -51,7 +52,7 @@ int pacman_aligned_dir(Pacman *pacman, int dir) {
 }
 
 
-void pacman_do_move(Partie *partie, int dir);
+void pacman_do_move(Partie *partie, direction dir);
 
 void pacman_deplace(Partie *partie) {
 
@@ -124,7 +125,7 @@ void pacman_deplace(Partie *partie) {
 }
 
 
-void pacman_do_move(Partie *partie, int dir) {
+void pacman_do_move(Partie *partie, direction dir) {
     Pos vector = dir_to_vector(dir);
     vector.x *= pacman_px_per_frame;
     vector.y *= pacman_px_per_frame;

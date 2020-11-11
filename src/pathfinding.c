@@ -1,18 +1,23 @@
 #include "./pathfinding.h"
 #include <signal.h>
 #include "../lib/libgraphique.h"
+#include "utils.h"
 #include "display.h"
 
-
-
+typedef enum {
+    PATH_FOUND,
+    PATH_DISTANCE_REACHED,
+    PATH_MAX_ITER_REACHED,
+    NO_PATH_FOUND
+} pathcode;
 
 typedef struct Node {
     int empty;
-    Case* node_case;
+    Case *node_case;
     int f_cost; //sum of h_cost and g_cost
     int h_cost; //dist from finish (static straight line)
     int g_cost; //dist from start (following neighbours, this is dynamic)
-    struct Node* parent;
+    struct Node *parent;
 } Node;
 
 
@@ -20,21 +25,22 @@ int get_hcost(Case *c);
 
 int get_cheapest_node();
 
-int path_finder(Partie *p);
+int manhattan_distance(const Case *aCase, const Case *b, const Partie *p);
 
-int get_g_cost(Node *parent);
+pathcode path_finder(Partie *p, int avoid);
 
-void check_neighbours(Node *parent, Partie *p);
+int get_g_cost(Node *parent, Partie *partie, Node *neightbour);
+
+void check_neighbours(Node *parent, Partie *p, int avoid);
 
 int closed_node_in_case(Case *c);
 
 int open_node_in_case(Case *c);
 
-void set_cost(Node *n, Node *neightbour, Partie *p);
+void set_cost(Node *node, Node *parent, Partie *p, int i);
 
 int get_f_cost(int nodeI, Node *parent, Partie *partie);
 
-int get_h_cost(const Node *n, const Partie *p);
 
 int open_node_index = 0;
 int closed_node_index = 0;
@@ -44,8 +50,8 @@ Node open_node[array_max];
 Node closed_node[array_max];
 
 
-int path_init(Case *start, Partie *p) {
-    if (meme_case(start,p->pacman.case_pacman)){
+int path_init(Case *start, Partie *p, int avoid) {
+    if (meme_case(start, p->pacman.case_pacman)) {
         return -1;
     }
     for (int i = 0; i < array_max; ++i) {
@@ -56,9 +62,10 @@ int path_init(Case *start, Partie *p) {
     Node *start_node = &open_node[0];
     start_node->node_case = start;
     start_node->empty = 0;
-    start_node->f_cost = abs(p->pacman.case_pacman->x - start->x) + abs(p->pacman.case_pacman->y - start->y);
-    start_node->h_cost = abs(p->pacman.case_pacman->x - start->x) + abs(p->pacman.case_pacman->y - start->y);
+
+    start_node->h_cost = manhattan_distance(start_node->node_case, p->pacman.case_pacman, p);
     start_node->g_cost = 0;
+    start_node->f_cost = start_node->h_cost;
     start_node->parent = NULL;
 
 
@@ -66,28 +73,48 @@ int path_init(Case *start, Partie *p) {
     open_node_index = 0;
 
 
-    int path = path_finder(p);
-
-    if(path == 0){
-        return -1;
-    }
-
+    pathcode path = path_finder(p, avoid);
 
     Node cur = closed_node[closed_node_index];
+    if (path == NO_PATH_FOUND) {
+        return -1;
+    }
+    int index, max_f_cost;
 
+    switch (path) {
+        case NO_PATH_FOUND:
+            return -1;
+        case PATH_MAX_ITER_REACHED:
+            max_f_cost = cur.f_cost;
+            index = -1;
 
+            for (int i = 0; i < closed_node_index + 1; ++i) {
+                if (closed_node[i].empty) continue;
+                if (closed_node[i].f_cost <= max_f_cost) {
+                    index = i;
+                    max_f_cost = closed_node[i].f_cost;
+                }
+            }
 
-    while(!meme_case(cur.parent->node_case,start)){
-        cur = *cur.parent;
+            cur = closed_node[index];
+            break;
+        case PATH_DISTANCE_REACHED:
+        case PATH_FOUND:
+            while (cur.parent != NULL && !meme_case(cur.parent->node_case, start)) {
+                cur = *cur.parent;
+            }
     }
 
 
-    return dir_from_to(start,cur.node_case);
+    return dir_from_to(start, cur.node_case, p);
 }
 
-void dessiner_parent(Node *node){
-    if(node->parent != NULL) {
-        int dir = dir_from_to(node->parent->node_case, node->node_case);
+void dessiner_parent(Node *node, Partie *p) {
+    char fcost[3];
+    sprintf(fcost, "%d", node->h_cost);
+    afficher_texte(fcost, 10, to_point(get_case_center(node->node_case)), black);
+    if (node->parent != NULL) {
+        int dir = dir_from_to(node->parent->node_case, node->node_case, p);
 
         Point center = to_point(get_case_center(node->node_case));
 
@@ -110,37 +137,42 @@ void dessiner_parent(Node *node){
     }
 }
 
-int path_finder(Partie* p){
-    while(1) {
+pathcode path_finder(Partie *p, int avoid) {
+    extern int pathfinding_debug;
+    int iter = 0;
+    while (1) {
 
-//        for (int x = 0; x < p->xmax; x++) {
-//            for (int y = 0; y < p->ymax; y++) {
-//                Case *aCase=  &p->plateau[x][y];
-//                int oc = open_node_in_case(aCase);
-//                if (oc != -1){
-//                    Node *node = &open_node[oc];
-//
-//                    remplir_case(aCase,green);
-//
-//                    dessiner_parent(node);
-//
-//                }
-//                int cc = closed_node_in_case(aCase);
-//                if (cc != -1){
-//                    Node *node = &closed_node[cc];
-//                    remplir_case(aCase,red);
-//                    dessiner_parent(node);
-//
-//                }
-//
-//            }
-//        }
-//        actualiser();
-//        //pause
-//        printf("wait\n");
-//        attendre_clic();
-//        printf("stopwait\n");
+        if (pathfinding_debug == 1) {
+            dessiner_plateau(p);
+            dessiner_entities(p);
+            for (int x = 0; x < p->xmax; x++) {
+                for (int y = 0; y < p->ymax; y++) {
+                    Case *aCase = &p->plateau[x][y];
+                    int oc = open_node_in_case(aCase);
+                    if (oc != -1) {
+                        Node *node = &open_node[oc];
 
+                        remplir_case(aCase, green);
+
+                        dessiner_parent(node, p);
+
+                    }
+                    int cc = closed_node_in_case(aCase);
+                    if (cc != -1) {
+                        Node *node = &closed_node[cc];
+                        remplir_case(aCase, red);
+                        dessiner_parent(node, p);
+
+                    }
+
+                }
+            }
+            actualiser();
+            //pause
+            printf("wait\n");
+            attendre_clic();
+            printf("stopwait\n");
+        }
         int ni = get_cheapest_node();
         if (ni == -1) return 0;
         Node *n = &open_node[ni];
@@ -148,11 +180,20 @@ int path_finder(Partie* p){
         closed_node[++closed_node_index] = *n;
         closed_node[closed_node_index].empty = 0;
 
-        if ((n->node_case->x == p->pacman.case_pacman->x) && (n->node_case->y == p->pacman.case_pacman->y)) {
-            return 1;
+        if (avoid) {
+            if (manhattan_distance(n->node_case, p->pacman.case_pacman, p) >= FLEE_MAX_PATH_DISTANCE) {
+                return PATH_DISTANCE_REACHED;
+            } else if (iter > FLEE_MAX_PATH_ITER) {
+                return PATH_MAX_ITER_REACHED;
+            }
+        } else {
+            if (manhattan_distance(n->node_case, p->pacman.case_pacman, p) == 0) {
+                return PATH_FOUND;
+            }
         }
 
-        check_neighbours(n, p);
+        check_neighbours(n, p, avoid);
+        iter++;
     }
 }
 
@@ -160,14 +201,14 @@ int path_finder(Partie* p){
 int has_fantome(Case *target, Partie *p) {
     int f = 0;
     for (int i = 0; i < NBFANTOMES; ++i) {
-        if (meme_case(target,p->fantomes[i].case_fantome))f++;
+        if (meme_case(target, p->fantomes[i].case_fantome))f++;
     }
     return f;
 }
 
-void check_neighbours(Node *parent, Partie *p) {
+void check_neighbours(Node *parent, Partie *p, int avoid) {
 
-    for (int dir = DIR_HAUT; dir < DIR_GAUCHE + 1; ++dir) {
+    for (direction dir = DIR_HAUT; dir < DIR_GAUCHE + 1; ++dir) {
         Case *target = get_case_at(p, parent->node_case, dir);
         if (target == NULL || target->wall || closed_node_in_case(target) != -1) {
             continue;
@@ -180,10 +221,10 @@ void check_neighbours(Node *parent, Partie *p) {
                 neighbour->empty = 0;
                 neighbour->node_case = target;
                 neighbour->parent = parent;
-                set_cost(parent, neighbour, p);
+                set_cost(neighbour, parent, p, avoid);
             } else {
                 Node *neighbour = &open_node[open_node_in_case(target)];
-                set_cost(parent, neighbour, p);
+                set_cost(neighbour, parent, p, avoid);
                 neighbour->parent = parent;
 
             }
@@ -194,16 +235,16 @@ void check_neighbours(Node *parent, Partie *p) {
 
 int get_f_cost(int nodeI, Node *parent, Partie *partie) {
     Node *node = &open_node[nodeI];
-    return get_g_cost(parent) + get_h_cost(node, partie);
+    return get_g_cost(parent, partie, node) + manhattan_distance(node->node_case, partie->pacman.case_pacman, partie);
 }
 
 int get_cheapest_node() {
-    int max_f_cost = -1;
+    int max_f_cost = open_node[0].f_cost;
     int index = -1;
 
-    for (int i = 0; i < array_max; ++i) {
+    for (int i = 0; i < open_node_index + 1; ++i) {
         if (open_node[i].empty) continue;
-        if (max_f_cost == -1 || open_node[i].f_cost < max_f_cost ) {
+        if (open_node[i].f_cost <= max_f_cost) {
             index = i;
             max_f_cost = open_node[i].f_cost;
         }
@@ -213,7 +254,7 @@ int get_cheapest_node() {
 }
 
 int closed_node_in_case(Case *c) {
-    for (int i = 0; i < array_max; ++i) {
+    for (int i = 0; i < closed_node_index + 1; ++i) {
         if (!closed_node[i].empty && (closed_node[i].node_case->x == c->x && closed_node[i].node_case->y == c->y)) {
             return i;
         }
@@ -222,7 +263,7 @@ int closed_node_in_case(Case *c) {
 }
 
 int open_node_in_case(Case *c) {
-    for (int i = 0; i < array_max; ++i) {
+    for (int i = 0; i < open_node_index + 1; ++i) {
         if (!open_node[i].empty && (open_node[i].node_case->x == c->x && open_node[i].node_case->y == c->y)) {
             return i;
         }
@@ -230,18 +271,36 @@ int open_node_in_case(Case *c) {
     return -1;
 }
 
-int get_g_cost(Node *parent) {
+int get_g_cost(Node *parent, Partie *partie, Node *neightbour) {
     return parent->g_cost + 1;
 }
 
-void set_cost(Node *n, Node *neightbour, Partie *p) {
-    neightbour->g_cost = get_g_cost(n);
+void set_cost(Node *node, Node *parent, Partie *p, int i) {
+    node->g_cost = get_g_cost(parent, p, node);
 
-    neightbour->h_cost = get_h_cost(n, p);
+    node->h_cost = manhattan_distance(node->node_case, p->pacman.case_pacman, p);
+    if (i) node->h_cost *= -1;
 
-    neightbour->f_cost = neightbour->h_cost + neightbour->g_cost;
+    node->f_cost = node->h_cost + node->g_cost;
 }
 
-int get_h_cost(const Node *n, const Partie *p) {
-    return abs(p->pacman.case_pacman->x - n->node_case->x) + abs(p->pacman.case_pacman->y - n->node_case->y);
+int min(int a, int b) {
+    return a < b ? a : b;
+}
+
+
+// https://stackoverflow.com/questions/23580083/manhattan-distance-for-a-2d-toroid
+
+int manhattan_distance(const Case *aCase, const Case *b, const Partie *p) {
+    int walk_mhdx = abs(aCase->x - b->x);
+    int walk_mhdy = abs(aCase->y - b->y);
+
+    int wrap_mhdx = p->xmax - walk_mhdx;
+    int wrap_mhdy = p->ymax - walk_mhdy;
+
+
+    int dx = min(walk_mhdx, wrap_mhdx);
+    int dy = min(walk_mhdy, wrap_mhdy);
+
+    return dx + dy;
 }

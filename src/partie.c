@@ -174,7 +174,7 @@ Partie convert_partie(Char_Partie charPartie) {
     for (int i = 0; i < NBFANTOMES; ++i) {
         Pos fantome_pos = charPartie.fantomes[i];
         Case *c = &partie_data.plateau[fantome_pos.y][fantome_pos.x];
-        partie_data.fantomes[i] = (Fantome) {c, 0, get_case_center(c), fantome_name};
+        partie_data.fantomes[i] = (Fantome) {c, 0, get_case_center(c), fantome_name, 0};
         fantome_name++;
     }
 

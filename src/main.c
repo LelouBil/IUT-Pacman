@@ -35,8 +35,12 @@ Partie init_graphique(const Partie *partie) {
 
     dessiner_plateau(partie); // a faire qu'une seule fois
 
+    dessiner_entities(partie);
+
     return (*partie);
 }
+
+int pathfinding_debug = 0;
 
 int main(int argc, char **argv) {
 
@@ -67,11 +71,14 @@ void game_loop(Partie *partie) {
     while (!EXIT_FLAG) {
 
 
-
         traiter_evenements();
 
         if (touche_a_ete_pressee(SDLK_ESCAPE)) {
             EXIT_FLAG = 1;
+        }
+
+        if (touche_a_ete_pressee(SDLK_SPACE)) {
+            pathfinding_debug = !pathfinding_debug;
         }
 
         key_events(partie);

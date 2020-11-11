@@ -9,7 +9,7 @@ void remplir_case(const Case *c, int color) {
 }
 
 void dessiner_fantome(const Fantome *f) {
-    dessiner_disque(to_point(f->position), SIZE_FANTOME, COLOR_FANTOMES[f->type_fantome]);
+    dessiner_disque(to_point(f->position), SIZE_FANTOME, COLOR_FANTOMES[f->type]);
 }
 
 void dessiner_pacman(const Pacman *p) {
@@ -52,7 +52,7 @@ void dessiner_case(const Case *c) {
         remplir_case(c, COLOR_BG);
 
 
-        switch (c->type_gomme) {
+        switch (c->gomme) {
             case GOMME_PAC:
                 dessiner_gomme_pac(c);
                 break;

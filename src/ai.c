@@ -3,6 +3,7 @@
 #include "gameplay.h"
 #include "utils.h"
 #include "pathfinding.h"
+#include "timings.h"
 
 int DIR_AVAILABLE[4];
 
@@ -20,30 +21,63 @@ void fantome_event_manager(Partie *partie){
 
     for(int i = 0;i < NBFANTOMES;i++) {
         Fantome *f = &partie->fantomes[i];
-        if (start_timer[i] <= 0){
-            fantome_behaviour[i](f,partie);
-        } else{
+        if (start_timer[i] <= 0) {
+            if (!f->oob)fantome_behaviour[i](f, partie);
+            fantome_move(f);
+        } else {
             //printf("%d : %d\n",i,start_timer[i]);
-            start_timer[i]-= framerate;
+            start_timer[i] -= framerate;
         }
 
+        Pos p = f->position;
+
+        int cx = p.x / PLATEAU_BLOCK_TAILLE;
+        int cy = p.y / PLATEAU_BLOCK_TAILLE;
+
+
+        if (cx >= 0 && cx < partie->xmax && cy >= 0 && cy < partie->ymax) {
+            f->oob = 0;
+        } else {
+            f->oob = 1;
+        }
+
+
+        int tunnel = 0;
+
+        if (cx > partie->xmax) {
+            cx = -1;
+            tunnel = 1;
+        } else if (cx < 0) {
+            cx = partie->xmax;
+            tunnel = 1;
+        }
+
+        if (cy > partie->ymax) {
+            cy = -1;
+            tunnel = 1;
+        } else if (cy < 0) {
+            cy = partie->ymax;
+            tunnel = 1;
+        }
+
+
+        if (tunnel) {
+
+            f->position = (Pos) {cx * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2,
+                                 cy * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2};
+        }
+
+        if (!f->oob) {
+            f->case_fantome = &partie->plateau[cx][cy];
+        }
     }
 }
 
 void blinky_behaviour(Fantome *blinky, Partie *partie){
     if (fantome_aligned_case(blinky)) {
 
-        blinky->direction = path_init(blinky->case_fantome, partie);
+        blinky->direction = path_init(blinky->case_fantome, partie, 0);
     }
-    fantome_move(blinky);
-
-    Pos p = blinky->position;
-
-    int cx = p.x / PLATEAU_BLOCK_TAILLE;
-    int cy = p.y / PLATEAU_BLOCK_TAILLE;
-
-
-    blinky->case_fantome = &partie->plateau[cx][cy];
 }
 
 void fantome_move(Fantome* f){

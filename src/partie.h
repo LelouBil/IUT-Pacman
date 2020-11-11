@@ -1,9 +1,6 @@
 #pragma once
 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 //region Defines
 
 //region plateau
@@ -11,17 +8,26 @@
 //endregion
 
 //region Fantome Types
-#define FANTOME_BLINKY 0
-#define FANTOME_PINKY 1
-#define FANTOME_INKY 2
-#define FANTOME_CLYDE 3
+typedef enum {
+    FANTOME_BLINKY, FANTOME_PINKY, FANTOME_INKY, FANTOME_CLYDE
+} type_fantome;
 //endregion
 
 //region Gomme types
-#define GOMME_EMPTY 0
-#define GOMME_PAC 1
-#define GOMME_BONUS 2
+
+typedef enum {
+    GOMME_EMPTY,
+    GOMME_PAC,
+    GOMME_BONUS
+} type_gomme;
 //endregion
+
+typedef enum {
+    DIR_HAUT,
+    DIR_DROITE,
+    DIR_BAS,
+    DIR_GAUCHE
+} direction;
 
 //region jeu
 #define NBFANTOMES 4 // nombres de fantômes dans les plateaux chargés
@@ -55,14 +61,14 @@ typedef struct {
 typedef struct {
     int x, y;
     int wall;
-    int type_gomme; // 0 rien, 1 pac gomme, 2 bonus
+    type_gomme gomme; // 0 rien, 1 pac gomme, 2 bonus
     //int pas;
 } Case;
 
 // pacman
 typedef struct {
     Case *case_pacman;
-    int direction;
+    direction direction;
     Pos position; //pos EN PIXEL
     int oob;
 } Pacman;
@@ -70,9 +76,10 @@ typedef struct {
 
 typedef struct {
     Case *case_fantome;
-    int direction;
+    direction direction;
     Pos position;
-    int type_fantome;
+    type_fantome type;
+    int oob;
 } Fantome;
 
 // Une partie
@@ -85,6 +92,8 @@ typedef struct {
     int gomme_restant;
 } Partie;
 //endregion
+
+
 
 //region PROTOTYPES
 // charge_plan : lit un fichier contenant un plateau de jeu et le charge en mémoire, dans le champ 'plateau' d'une Partie

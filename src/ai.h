@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gameplay.h"
+#include "partie.h"
 
 //#define AI_MAX_STEP 50
 
