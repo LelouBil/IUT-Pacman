@@ -239,7 +239,7 @@ int get_f_cost(int nodeI, Node *parent, Partie *partie) {
 }
 
 int get_cheapest_node() {
-    int max_f_cost = open_node[0].f_cost;
+    int max_f_cost = open_node[open_node_index].f_cost;
     int index = -1;
 
     for (int i = 0; i < open_node_index + 1; ++i) {
