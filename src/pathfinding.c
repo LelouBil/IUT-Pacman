@@ -21,7 +21,6 @@ typedef struct Node {
 } Node;
 
 
-int get_hcost(Case *c);
 
 int get_cheapest_node();
 
@@ -107,6 +106,19 @@ int path_init(Case *start, Partie *p, int avoid) {
 
 
     return dir_from_to(start, cur.node_case, p);
+}
+
+int path_panic(Case* c, Partie *partie, int original_dir){
+    int for_offset = entier_aleatoire(4);
+
+    for (int i = for_offset; i < for_offset + 4; ++i) {
+        if(!get_case_at(partie,c,i%4)->wall){
+            if(original_dir != (i + 2)%4) {
+                return i % 4;
+            }
+        }
+    }
+    return -1; //should never happen
 }
 
 void dessiner_parent(Node *node, Partie *p) {

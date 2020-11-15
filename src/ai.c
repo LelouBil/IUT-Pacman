@@ -87,8 +87,13 @@ void fantome_event_manager(Partie *partie) {
 
 void blinky_behaviour(Fantome *blinky, Partie *partie){
     if (fantome_aligned_case(blinky)) {
+        if(partie->bonus_timer == 0) {
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/ );
+        }
+        else{
+            blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
+        }
 
-        blinky->direction = path_init(blinky->case_fantome, partie, 0);
     }
 }
 

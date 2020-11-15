@@ -168,6 +168,8 @@ Partie convert_partie(Char_Partie charPartie) {
         }
     }
 
+    partie_data.bonus_timer = 0;
+
 
     int fantome_name = FANTOME_BLINKY;
 
@@ -188,6 +190,8 @@ Partie convert_partie(Char_Partie charPartie) {
     for (int i = 0; i < charPartie.C; ++i) {
         free(charPartie.plateau[i]);
     }
+
+
     free(charPartie.plateau);
 
     return partie_data;

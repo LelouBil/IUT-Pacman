@@ -13,6 +13,9 @@ int check_collisions(Partie *partie) {
 }
 
 int collisions_pac_fantome(Partie *partie) {
+    for (int i = 0; i < NBFANTOMES; ++i) {
+        return(abs(partie->fantomes->position.x-partie->pacman.position.x) < PLATEAU_BLOCK_TAILLE && abs(partie->fantomes->position.y-partie->pacman.position.y) < PLATEAU_BLOCK_TAILLE);
+    }
     return 0;
 }
 
@@ -26,7 +29,7 @@ void collision_pac_gomme(Partie *partie) {
             p.case_pacman->gomme = GOMME_EMPTY;
             break;
         case GOMME_BONUS:
-            //todo p.bonus_timer = BONUS_MAX_TIME;
+            partie->bonus_timer = BONUS_MAX_TIME;
             p.case_pacman->gomme = GOMME_EMPTY;
             break;
     }

@@ -31,6 +31,7 @@ typedef enum {
 
 //region jeu
 #define NBFANTOMES 4 // nombres de fantômes dans les plateaux chargés
+#define BONUS_MAX_TIME 5000 //temps max du mode super pac gomme
 #define VIE_MAX 3
 //endregion
 
@@ -71,6 +72,7 @@ typedef struct {
     direction direction;
     Pos position; //pos EN PIXEL
     int oob;
+    int bonus_timer;
 } Pacman;
 //endregion
 
@@ -91,6 +93,7 @@ typedef struct {
     Fantome fantomes[NBFANTOMES];
     int gomme_restant;
     int level;
+    int bonus_timer;
 } Partie;
 //endregion
 
