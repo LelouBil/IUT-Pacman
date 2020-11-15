@@ -4,16 +4,16 @@
 
 void collision_pac_gomme(Partie *partie);
 
-void collisions_pac_fantome(Partie *partie);
+int collisions_pac_fantome(Partie *partie);
 
-void check_collisions(Partie *partie) {
+int check_collisions(Partie *partie) {
     collision_pac_gomme(partie);
     collision_pac_gomme(partie);
-    collisions_pac_fantome(partie);
+    return collisions_pac_fantome(partie);
 }
 
-void collisions_pac_fantome(Partie *partie) {
-
+int collisions_pac_fantome(Partie *partie) {
+    return 0;
 }
 
 void collision_pac_gomme(Partie *partie) {

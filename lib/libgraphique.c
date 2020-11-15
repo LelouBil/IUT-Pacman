@@ -39,23 +39,28 @@ char *NOM_POLICE = "./lib/verdana.ttf" ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // 1. Ouvrir et fermer une fenêtre
+TTF_Font *polices[256];
 
 // ouvrir une fenêtre de taille largeur (x), hauteur (y)
-void ouvrir_fenetre(int largeur, int hauteur){
-    FILE *f=fopen(NOM_POLICE,"r");
-    if(!f)
-        {
-        fprintf(stderr,"Erreur: le chemin '%s' ne permet pas de trouver le dossier 'lib' et la police 'verdana.ttf'\n",NOM_POLICE);
+void ouvrir_fenetre(int largeur, int hauteur) {
+    FILE *f = fopen(NOM_POLICE, "r");
+    if (!f) {
+        fprintf(stderr, "Erreur: le chemin '%s' ne permet pas de trouver le dossier 'lib' et la police 'verdana.ttf'\n",
+                NOM_POLICE);
         exit(1);
-        }
+    }
     fclose(f);
 
-    SDL_Init(SDL_INIT_VIDEO); 
-    ecran = SDL_SetVideoMode(largeur, hauteur, 32, SDL_HWSURFACE|SDL_DOUBLEBUF ); 
+    SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
+    int i;
+    for (i = 1; i < 256; i++)
+        polices[i] = TTF_OpenFont(NOM_POLICE, i);
+    ecran = SDL_SetVideoMode(largeur, hauteur, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
     //initialisation des variables globales
-    LARGEUR = largeur ;
-    HAUTEUR = hauteur ;
+    LARGEUR = largeur;
+    HAUTEUR = hauteur;
     //printf("LARGEUR %d HAUTEUR %d\n",LARGEUR,HAUTEUR);
 
     // pour permettre les répétitions de touche si elles restent enfoncées
@@ -409,20 +414,11 @@ Point deplacement_souris_a_eu_lieu()
 // TEXTE
 TTF_Font * __police = NULL ;  // police courante , ne pas modidier
 
+
+
 //affiche du texte de taille de police donnée ; coin est le coin haut gauche du texte
 void afficher_texte(char *texte, int taille, Point coin, Couleur couleur)
 {
-    static int ttf_deja_init = 0 ; //appel seulement la premiere fois
-    static TTF_Font *polices[256] ; //les polices de toutes tailles
-    if (!ttf_deja_init)
-    {
-        TTF_Init();
-        int i;
-        for(i=1;i<256;i++)
-            polices[i] = TTF_OpenFont(NOM_POLICE, i);
-
-        ttf_deja_init = 1;
-    }
 
     __police = polices[taille] ;
 
@@ -431,7 +427,7 @@ void afficher_texte(char *texte, int taille, Point coin, Couleur couleur)
         SDL_Color coul_police ;
         SDL_GetRGB(couleur,ecran->format,&(coul_police.r),&(coul_police.g),&(coul_police.b));
 
-        SDL_Surface *surftexte= TTF_RenderText_Blended(__police, texte, coul_police);
+        SDL_Surface *surftexte = TTF_RenderUTF8_Blended(__police, texte, coul_police);
         SDL_Rect position;
         position.x = coin.x;
         position.y=  coin.y;
@@ -444,7 +440,7 @@ void afficher_texte(char *texte, int taille, Point coin, Couleur couleur)
 Point taille_texte(char *texte, int taille)
 {   Point p = {-10, -10};
     afficher_texte("", taille, p, noir) ; //pour fixer __police
-    TTF_SizeText(__police, texte, &p.x, &p.y);
+    TTF_SizeUTF8(__police, texte, &p.x, &p.y);
     return p;
 }
 

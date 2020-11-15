@@ -1,6 +1,7 @@
 #include "./display.h"
 
 #include "utils.h"
+#include "main.h"
 
 //region Fonctions privées
 
@@ -73,21 +74,38 @@ void dessiner_rect_cases(const Partie *p, int cx, int cy) {
     }
 }
 
-void dessiner_entities(const Partie *partie){
+void dessiner_entities(const Partie *partie) {
 
-    dessiner_rect_cases(partie,partie->pacman.case_pacman->x,partie->pacman.case_pacman->y);
+    dessiner_rect_cases(partie, partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
-        dessiner_rect_cases(partie,fantome->case_fantome->x,fantome->case_fantome->y);
+        dessiner_rect_cases(partie, fantome->case_fantome->x, fantome->case_fantome->y);
     }
 
 
     dessiner_pacman(&partie->pacman);
 
-
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
-
         dessiner_fantome(fantome);
     }
 }
+
+void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
+    extern int window_width, window_height;
+    int twidth, theight;
+    Point point = taille_texte(text, pt);
+    twidth = point.x;
+    theight = point.y;
+
+    Point center = (Point) {window_width / 2, window_height / 2};
+
+    int padding = 5;
+    Point tcoin = (Point) {center.x - (twidth / 2) - 2, center.y - (theight / 2) - padding};
+
+    Point bcoin = (Point) {tcoin.x - padding, tcoin.y};
+
+    dessiner_rectangle(bcoin, twidth + padding, theight + padding, bgcolor);
+    afficher_texte(text, pt, tcoin, fgcolor);
+}
+

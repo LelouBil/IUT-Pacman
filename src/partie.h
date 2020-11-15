@@ -90,6 +90,7 @@ typedef struct {
     Pacman pacman;
     Fantome fantomes[NBFANTOMES];
     int gomme_restant;
+    int level;
 } Partie;
 //endregion
 

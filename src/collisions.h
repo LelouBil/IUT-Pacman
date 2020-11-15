@@ -2,5 +2,5 @@
 
 #include "partie.h"
 
-void check_collisions(Partie *partie);
+int check_collisions(Partie *partie);
 
