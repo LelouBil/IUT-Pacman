@@ -8,18 +8,30 @@
 int DIR_AVAILABLE[4];
 
 int fantome_aligned_case(Fantome *fantome);
-int fantome_update_direction(Partie *partie, Fantome* f);
-void fantome_move(Fantome* f);
-int dir_to_pacman(Fantome* f);
+
+int fantome_update_direction(Partie *partie, Fantome *f);
+
+void fantome_move(Fantome *f);
+
+int dir_to_pacman(Fantome *f);
+
 void blinky_behaviour(Fantome *blinky, Partie *partie);
 
-void (*fantome_behaviour[NBFANTOMES])(Fantome *fantome,Partie *partie) = {blinky_behaviour,blinky_behaviour,blinky_behaviour,blinky_behaviour};
+void (*fantome_behaviour[NBFANTOMES])(Fantome *fantome, Partie *partie) = {blinky_behaviour, blinky_behaviour,
+                                                                           blinky_behaviour, blinky_behaviour};
 
-int start_timer[NBFANTOMES] = {0,1000,2000,3000};
+int base_timer[NBFANTOMES] = {0, 1000, 2000, 3000};
+int start_timer[NBFANTOMES];
 
-void fantome_event_manager(Partie *partie){
+void reset_timers() {
+    for (int i = 0; i < NBFANTOMES; ++i) {
+        start_timer[i] = base_timer[i];
+    }
+}
 
-    for(int i = 0;i < NBFANTOMES;i++) {
+void fantome_event_manager(Partie *partie) {
+
+    for (int i = 0; i < NBFANTOMES; i++) {
         Fantome *f = &partie->fantomes[i];
         if (start_timer[i] <= 0) {
             if (!f->oob)fantome_behaviour[i](f, partie);

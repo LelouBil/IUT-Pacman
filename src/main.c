@@ -9,6 +9,8 @@
 
 void game_loop();
 
+void reinit_partie();
+
 Partie load_game_data(char *const plan_file) {
     printf("Chargement du plan...\n");
     Partie partie = charge_plan(plan_file);
@@ -41,7 +43,7 @@ Partie init_graphique(const Partie *partie) {
 }
 
 int pathfinding_debug = 0;
-
+Partie mainpartie;
 int main(int argc, char **argv) {
 
     // sans ca le deboguage sous windows n'affiche les printf qu'apres la fin du programme
@@ -49,17 +51,10 @@ int main(int argc, char **argv) {
     setbuf(stdout, 0);
 #endif
 
-    // Traitement des arguments
-    if (argc != 2) {
-        printf("Usage: %s fichier_plan\n", argv[0]);
-        return 0;
-    }
 
-    Partie partie = load_game_data(argv[1]);
+    reinit_partie();
 
-    partie = init_graphique(&partie);
-
-    game_loop(&partie);
+    game_loop(&mainpartie);
 
 
     fermer_fenetre();
@@ -68,6 +63,7 @@ int main(int argc, char **argv) {
 
 void game_loop(Partie *partie) {
     int EXIT_FLAG = 0;
+    partie->gomme_restant = 5;
     while (!EXIT_FLAG) {
 
 
@@ -89,6 +85,12 @@ void game_loop(Partie *partie) {
 
         dessiner_entities(partie);
 
+        if (partie->gomme_restant == 0) {
+
+
+            reinit_partie();
+        }
+
         //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
 
         actualiser();
@@ -98,6 +100,13 @@ void game_loop(Partie *partie) {
         reinitialiser_evenements();
 
     }
+}
+
+void reinit_partie() {
+    mainpartie = load_game_data("data/test.txt");
+
+    mainpartie = init_graphique(&mainpartie);
+    reset_timers();
 }
 
 
