@@ -51,7 +51,6 @@ typedef struct {
     int wall;
     type_gomme gomme; // 0 rien, 1 pac gomme, 2 bonus
     //int pas;
-    int porte;
 } Case;
 
 // pacman
@@ -71,7 +70,6 @@ typedef struct {
     int oob;
     int speed;
     int alive;
-    int sorti;
     int flag;
 } Fantome;
 

@@ -51,10 +51,7 @@ void dessiner_plateau(const Partie *p) {
 
 void dessiner_case(const Case *c) {
 
-    if (c->porte) {
-        remplir_case(c, COLOR_BG);
-        dessiner_rectangle(get_point(c), PLATEAU_BLOCK_TAILLE, PLATEAU_BLOCK_TAILLE / 3, COLOR_WALL);
-    } else if (c->wall) {
+    if (c->wall) {
         remplir_case(c, COLOR_WALL);
     } else {
 

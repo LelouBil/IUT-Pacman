@@ -94,7 +94,6 @@ Partie load_partie_template(char *fichier) {
             p.plateau[x][y].y = y;
             p.plateau[x][y].wall = 0;
             p.plateau[x][y].gomme = 0;
-            p.plateau[x][y].porte = 0;
 
 
             switch (ch) {
@@ -102,10 +101,6 @@ Partie load_partie_template(char *fichier) {
                     p.plateau[x][y].gomme = 1;
                     p.gomme_restant++;
                     p.max_gommes++;
-                    break;
-                case '-':
-                    p.plateau[x][y].wall = 1;
-                    p.plateau[x][y].porte = 1;
                     break;
                 case '*':
                     p.plateau[x][y].wall = 1;
@@ -131,7 +126,6 @@ Partie load_partie_template(char *fichier) {
                     p.fantomes[nbf].alive = 1;
                     p.spawn_fantome[nbf] = p.fantomes[nbf].case_fantome;
                     p.fantomes[nbf].speed = 1;
-                    p.fantomes[nbf].sorti = 0;
                     p.fantomes[nbf].flag = 0;
                     nbf++;
 

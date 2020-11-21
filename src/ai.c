@@ -51,7 +51,6 @@ void fantome_event_manager(Partie *partie) {
                 if (!f->alive) {
                     if (meme_case(f->case_fantome, partie->spawn_fantome[i]) && fantome_aligned_case(f)) {
                         f->speed = 1;
-                        f->sorti = 0;
                         if (regen_timer[i] <= 0) {
                             f->alive = 1;
                             regen_timer[i] = REGEN_TIME;
@@ -63,13 +62,12 @@ void fantome_event_manager(Partie *partie) {
                         f->speed = 2;
                         if (fantome_aligned_case(f))
                             f->direction = path_init(f->case_fantome, partie, 0 /*obsolete*/ ,
-                                                     partie->spawn_fantome[i], 0);
+                                                     partie->spawn_fantome[i]);
                     }
                 } else {
                     if (partie->bonus_timer == BONUS_MAX_TIME) {
                         f->direction = get_oppos(f->direction);
                     } else {
-                        if (f->case_fantome->porte) f->sorti = 1;
                         fantome_behaviour[i](f, partie);
                     }
                 }
@@ -142,8 +140,7 @@ void blinky_behaviour(Fantome *blinky, Partie *partie) {
     if (fantome_aligned_case(blinky)) {
         if (partie->bonus_timer <= 0) {
             blinky->speed = 6 * (partie->level / 255) + 1;
-            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, partie->pacman.case_pacman,
-                                          blinky->sorti);
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, partie->pacman.case_pacman);
         } else {
             blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
         }
@@ -155,8 +152,7 @@ void inky_behaviour(Fantome *blinky, Partie *partie) {
     if (fantome_aligned_case(blinky)) {
         if (partie->bonus_timer <= 0 && entier_aleatoire(10) != 0) {
 
-            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, partie->pacman.case_pacman,
-                                          blinky->sorti);
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, partie->pacman.case_pacman);
         } else {
             blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
         }
@@ -172,8 +168,7 @@ void pinky_behaviour(Fantome *blinky, Partie *partie) {
                 target = partie->pacman.case_pacman;
             }
 
-            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, target,
-                                          blinky->sorti);
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, target);
         } else {
             blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
         }
@@ -193,8 +188,8 @@ void clyde_behaviour(Fantome *blinky, Partie *partie) {
                     blinky->flag = 0;
                 }
             }
-            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, target,
-                                          blinky->sorti);
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, target);
+
         } else {
             blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
         }

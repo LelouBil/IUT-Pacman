@@ -24,19 +24,17 @@ typedef struct Node {
 
 int get_cheapest_node();
 
-int manhattan_distance(const Case *aCase, const Case *b, const Partie *p);
-
-pathcode path_finder(Partie *p, int avoid, Case *goal, int i);
+pathcode path_finder(Partie *p, int avoid, Case *goal);
 
 int get_g_cost(Node *parent, Partie *partie, Node *neightbour);
 
-void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal, int sorti);
+void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal);
 
 int closed_node_in_case(Case *c);
 
 int open_node_in_case(Case *c);
 
-void set_cost(Node *node, Node *parent, Partie *p, int i, Case *goal);
+void set_cost(Node *node, Node *parent, Partie *p, Case *goal);
 
 int get_f_cost(int nodeI, Node *parent, Partie *partie, Case *goal);
 
@@ -49,7 +47,7 @@ Node open_node[array_max];
 Node closed_node[array_max];
 
 
-direction path_init(Case *start, Partie *p, int avoid, Case *goal, int sorti) {
+direction path_init(Case *start, Partie *p, int avoid, Case *goal) {
     if (meme_case(start, goal)) {
         return -1;
     }
@@ -72,7 +70,7 @@ direction path_init(Case *start, Partie *p, int avoid, Case *goal, int sorti) {
     open_node_index = 0;
 
 
-    pathcode path = path_finder(p, avoid, goal, sorti);
+    pathcode path = path_finder(p, avoid, goal);
 
     Node cur = closed_node[closed_node_index];
     if (path == NO_PATH_FOUND) {
@@ -154,7 +152,7 @@ void dessiner_parent(Node *node, Partie *p) {
     }
 }
 
-pathcode path_finder(Partie *p, int avoid, Case *goal, int sorti) {
+pathcode path_finder(Partie *p, int avoid, Case *goal) {
     extern int pathfinding_debug;
     int iter = 0;
     while (1) {
@@ -209,7 +207,7 @@ pathcode path_finder(Partie *p, int avoid, Case *goal, int sorti) {
             }
         }
 
-        check_neighbours(n, p, avoid, goal, sorti);
+        check_neighbours(n, p, avoid, goal);
         iter++;
     }
 }
@@ -223,11 +221,11 @@ int has_fantome(Case *target, Partie *p) {
     return f;
 }
 
-void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal, int sorti) {
+void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal) {
 
     for (direction dir = DIR_HAUT; dir < DIR_GAUCHE + 1; ++dir) {
         Case *target = get_case_at(p, parent->node_case, dir);
-        if (target == NULL || (target->wall && !target->porte) || (target->porte && sorti) ||
+        if (target == NULL || target->wall ||
             closed_node_in_case(target) != -1) {
             continue;
         }
@@ -239,10 +237,10 @@ void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal, int sorti)
                 neighbour->empty = 0;
                 neighbour->node_case = target;
                 neighbour->parent = parent;
-                set_cost(neighbour, parent, p, avoid, goal);
+                set_cost(neighbour, parent, p, goal);
             } else {
                 Node *neighbour = &open_node[open_node_in_case(target)];
-                set_cost(neighbour, parent, p, avoid, goal);
+                set_cost(neighbour, parent, p, goal);
                 neighbour->parent = parent;
 
             }
@@ -293,11 +291,11 @@ int get_g_cost(Node *parent, Partie *partie, Node *neightbour) {
     return parent->g_cost + 1;
 }
 
-void set_cost(Node *node, Node *parent, Partie *p, int i, Case *goal) {
+void set_cost(Node *node, Node *parent, Partie *p, Case *goal) {
     node->g_cost = get_g_cost(parent, p, node);
 
     node->h_cost = manhattan_distance(node->node_case, goal, p);
-    if (i) node->h_cost *= -1;
+    //node->h_cost *= -1;
 
     node->f_cost = node->h_cost + node->g_cost;
 }

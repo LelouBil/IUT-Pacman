@@ -10,7 +10,7 @@
 
 #define FLEE_MAX_PATH_DISTANCE 20
 
-direction path_init(Case *start, Partie *p, int avoid, Case *goal, int i);
+direction path_init(Case *start, Partie *p, int avoid, Case *goal);
 
 int manhattan_distance(const Case *aCase, const Case *b, const Partie *p);
 
