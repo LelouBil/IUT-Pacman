@@ -229,7 +229,7 @@ void save_score(int score) {
     char pseudo[3];
     scanf("%c%c%c", &pseudo[0], &pseudo[1], &pseudo[2]);
     fermer_fenetre();
-    printf("Votre pseudo est [%s]\n", pseudo);
+    printf("Votre pseudo est [%c%c%c]\n", pseudo[0], pseudo[1], pseudo[2]);
 
     FILE *score_file = fopen(SCORE_FILE, "w");
     if (score_file == NULL) {
