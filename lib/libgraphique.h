@@ -50,7 +50,7 @@ void fermer_fenetre();
 
 // teste si la fin du programme a été demandée et le termine si nécessaire
 // ne pas utiliser directement
-void _test_arret() ;
+int _test_arret();
 
 ////////////////////////////////////////////////////////////////////////////////
 // 2. Fonctions de dessin

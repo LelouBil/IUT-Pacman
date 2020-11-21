@@ -5,6 +5,8 @@
 #include "pathfinding.h"
 #include "timings.h"
 
+#define REGEN_TIME 3000
+
 int DIR_AVAILABLE[4];
 
 int fantome_aligned_case(Fantome *fantome);
@@ -20,12 +22,17 @@ void blinky_behaviour(Fantome *blinky, Partie *partie);
 void (*fantome_behaviour[NBFANTOMES])(Fantome *fantome, Partie *partie) = {blinky_behaviour, blinky_behaviour,
                                                                            blinky_behaviour, blinky_behaviour};
 
-int base_timer[NBFANTOMES] = {0, 1000, 2000, 3000};
+int base_timer[NBFANTOMES] = {0, 1000, 1000, 2000};
+
+int regen_timer[NBFANTOMES] = {REGEN_TIME, REGEN_TIME, REGEN_TIME, REGEN_TIME};
+
+
 int start_timer[NBFANTOMES];
 
 void reset_timers() {
     for (int i = 0; i < NBFANTOMES; ++i) {
         start_timer[i] = base_timer[i];
+        regen_timer[i] = REGEN_TIME;
     }
 }
 
@@ -34,8 +41,48 @@ void fantome_event_manager(Partie *partie) {
     for (int i = 0; i < NBFANTOMES; i++) {
         Fantome *f = &partie->fantomes[i];
         if (start_timer[i] <= 0) {
-            if (!f->oob)fantome_behaviour[i](f, partie);
-            fantome_move(f);
+            if (!f->oob) {
+                if (!f->alive) {
+                    if (meme_case(f->case_fantome, partie->spawn_fantome[i]) && fantome_aligned_case(f)) {
+                        f->speed = 1;
+                        f->sorti = 0;
+                        if (regen_timer[i] <= 0) {
+                            f->alive = 1;
+                            regen_timer[i] = REGEN_TIME;
+                        } else if (regen_timer[i] <= REGEN_TIME) {
+                            regen_timer[i] -= framerate;
+                        }
+                        continue;
+                    } else {
+                        f->speed = 2;
+                        if (fantome_aligned_case(f))
+                            f->direction = path_init(f->case_fantome, partie, 0 /*obsolete*/ ,
+                                                     partie->spawn_fantome[i], 0);
+                    }
+                } else {
+                    if (partie->bonus_timer == BONUS_MAX_TIME) {
+                        f->direction = get_oppos(f->direction);
+                    } else {
+                        if (f->case_fantome->porte) f->sorti = 1;
+                        fantome_behaviour[i](f, partie);
+                    }
+                }
+            }
+            int good = 1;
+            for (int j = 0; j < NBFANTOMES; ++j) {
+                if (i != j && fantome_aligned_case(f)) {
+                    if (meme_case(get_case_at(partie, f->case_fantome, f->direction),
+                                  partie->fantomes[j].case_fantome)) {
+                        if (partie->bonus_timer > 0)
+                            good = entier_aleatoire(1);
+                        else good = 0;
+                    }
+                    if (meme_case(f->case_fantome, partie->fantomes[j].case_fantome)) good = entier_aleatoire(1);
+                }
+            }
+            if (good || !f->alive) {
+                fantome_move(f);
+            }
         } else {
             //printf("%d : %d\n",i,start_timer[i]);
             start_timer[i] -= framerate;
@@ -87,19 +134,19 @@ void fantome_event_manager(Partie *partie) {
 
 void blinky_behaviour(Fantome *blinky, Partie *partie){
     if (fantome_aligned_case(blinky)) {
-        if(partie->bonus_timer == 0) {
-            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/ );
-        }
-        else{
+        if (partie->bonus_timer <= 0) {
+            blinky->direction = path_init(blinky->case_fantome, partie, 0 /*obsolete*/, partie->pacman.case_pacman,
+                                          blinky->sorti);
+        } else {
             blinky->direction = path_panic(blinky->case_fantome, partie, blinky->direction);
         }
 
     }
 }
 
-void fantome_move(Fantome* f){
-    f->position.x += 1 * dir_to_vector(f->direction).x;
-    f->position.y += 1* dir_to_vector(f->direction).y;
+void fantome_move(Fantome* f) {
+    f->position.x += f->speed * dir_to_vector(f->direction).x;
+    f->position.y += f->speed * dir_to_vector(f->direction).y;
 }
 
 int fantome_aligned_case(Fantome *fantome){

@@ -15,7 +15,9 @@ Point to_point(Pos p);
 
 Pos dir_to_vector(int key);
 
-int meme_case(Case* a, Case* b);
+int meme_case(Case *a, Case *b);
 
-int dir_from_to(Case *a, Case *b, Partie *p);
+direction dir_from_to(Case *a, Case *b, Partie *p);
+
+direction get_oppos(direction direction);
 //endregion

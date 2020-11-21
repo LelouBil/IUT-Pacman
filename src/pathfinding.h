@@ -10,8 +10,8 @@
 
 #define FLEE_MAX_PATH_DISTANCE 20
 
-int path_init(Case *start, Partie *p, int avoid);
+direction path_init(Case *start, Partie *p, int avoid, Case *goal, int i);
 
-int path_panic(Case *start, Partie *p, int original_dir);
+direction path_panic(Case *start, Partie *p, int original_dir);
 
 int get_case_color(const Case *c);

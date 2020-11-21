@@ -26,19 +26,19 @@ int get_cheapest_node();
 
 int manhattan_distance(const Case *aCase, const Case *b, const Partie *p);
 
-pathcode path_finder(Partie *p, int avoid);
+pathcode path_finder(Partie *p, int avoid, Case *goal, int i);
 
 int get_g_cost(Node *parent, Partie *partie, Node *neightbour);
 
-void check_neighbours(Node *parent, Partie *p, int avoid);
+void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal, int sorti);
 
 int closed_node_in_case(Case *c);
 
 int open_node_in_case(Case *c);
 
-void set_cost(Node *node, Node *parent, Partie *p, int i);
+void set_cost(Node *node, Node *parent, Partie *p, int i, Case *goal);
 
-int get_f_cost(int nodeI, Node *parent, Partie *partie);
+int get_f_cost(int nodeI, Node *parent, Partie *partie, Case *goal);
 
 
 int open_node_index = 0;
@@ -49,8 +49,8 @@ Node open_node[array_max];
 Node closed_node[array_max];
 
 
-int path_init(Case *start, Partie *p, int avoid) {
-    if (meme_case(start, p->pacman.case_pacman)) {
+direction path_init(Case *start, Partie *p, int avoid, Case *goal, int sorti) {
+    if (meme_case(start, goal)) {
         return -1;
     }
     for (int i = 0; i < array_max; ++i) {
@@ -62,7 +62,7 @@ int path_init(Case *start, Partie *p, int avoid) {
     start_node->node_case = start;
     start_node->empty = 0;
 
-    start_node->h_cost = manhattan_distance(start_node->node_case, p->pacman.case_pacman, p);
+    start_node->h_cost = manhattan_distance(start_node->node_case, goal, p);
     start_node->g_cost = 0;
     start_node->f_cost = start_node->h_cost;
     start_node->parent = NULL;
@@ -72,7 +72,7 @@ int path_init(Case *start, Partie *p, int avoid) {
     open_node_index = 0;
 
 
-    pathcode path = path_finder(p, avoid);
+    pathcode path = path_finder(p, avoid, goal, sorti);
 
     Node cur = closed_node[closed_node_index];
     if (path == NO_PATH_FOUND) {
@@ -108,17 +108,22 @@ int path_init(Case *start, Partie *p, int avoid) {
     return dir_from_to(start, cur.node_case, p);
 }
 
-int path_panic(Case* c, Partie *partie, int original_dir){
-    int for_offset = entier_aleatoire(4);
+direction path_panic(Case *c, Partie *partie, int original_dir) {
 
-    for (int i = for_offset; i < for_offset + 4; ++i) {
-        if(!get_case_at(partie,c,i%4)->wall){
-            if(original_dir != (i + 2)%4) {
-                return i % 4;
-            }
+    static direction dir_list[4] = {-1, -1, -1, -1};
+
+    int dir_i = 0;
+
+    for (direction i = 0; i < 4; ++i) {
+        if (i != get_oppos(original_dir) && !get_case_at(partie, c, i)->wall) {
+            dir_list[dir_i] = i;
+            dir_i++;
         }
     }
-    return -1; //should never happen
+
+    int random = entier_aleatoire(dir_i);
+
+    return dir_list[random];
 }
 
 void dessiner_parent(Node *node, Partie *p) {
@@ -149,7 +154,7 @@ void dessiner_parent(Node *node, Partie *p) {
     }
 }
 
-pathcode path_finder(Partie *p, int avoid) {
+pathcode path_finder(Partie *p, int avoid, Case *goal, int sorti) {
     extern int pathfinding_debug;
     int iter = 0;
     while (1) {
@@ -193,18 +198,18 @@ pathcode path_finder(Partie *p, int avoid) {
         closed_node[closed_node_index].empty = 0;
 
         if (avoid) {
-            if (manhattan_distance(n->node_case, p->pacman.case_pacman, p) >= FLEE_MAX_PATH_DISTANCE) {
+            if (manhattan_distance(n->node_case, goal, p) >= FLEE_MAX_PATH_DISTANCE) {
                 return PATH_DISTANCE_REACHED;
             } else if (iter > FLEE_MAX_PATH_ITER) {
                 return PATH_MAX_ITER_REACHED;
             }
         } else {
-            if (manhattan_distance(n->node_case, p->pacman.case_pacman, p) == 0) {
+            if (manhattan_distance(n->node_case, goal, p) == 0) {
                 return PATH_FOUND;
             }
         }
 
-        check_neighbours(n, p, avoid);
+        check_neighbours(n, p, avoid, goal, sorti);
         iter++;
     }
 }
@@ -218,25 +223,26 @@ int has_fantome(Case *target, Partie *p) {
     return f;
 }
 
-void check_neighbours(Node *parent, Partie *p, int avoid) {
+void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal, int sorti) {
 
     for (direction dir = DIR_HAUT; dir < DIR_GAUCHE + 1; ++dir) {
         Case *target = get_case_at(p, parent->node_case, dir);
-        if (target == NULL || target->wall || closed_node_in_case(target) != -1) {
+        if (target == NULL || (target->wall && !target->porte) || (target->porte && sorti) ||
+            closed_node_in_case(target) != -1) {
             continue;
         }
 
-        if (open_node_in_case(target) == -1 || get_f_cost(open_node_in_case(target), parent, p) <
+        if (open_node_in_case(target) == -1 || get_f_cost(open_node_in_case(target), parent, p, goal) <
                                                open_node[open_node_in_case(target)].f_cost) {
             if (open_node_in_case(target) == -1) {
                 Node *neighbour = &open_node[++open_node_index];
                 neighbour->empty = 0;
                 neighbour->node_case = target;
                 neighbour->parent = parent;
-                set_cost(neighbour, parent, p, avoid);
+                set_cost(neighbour, parent, p, avoid, goal);
             } else {
                 Node *neighbour = &open_node[open_node_in_case(target)];
-                set_cost(neighbour, parent, p, avoid);
+                set_cost(neighbour, parent, p, avoid, goal);
                 neighbour->parent = parent;
 
             }
@@ -245,9 +251,9 @@ void check_neighbours(Node *parent, Partie *p, int avoid) {
     }
 }
 
-int get_f_cost(int nodeI, Node *parent, Partie *partie) {
+int get_f_cost(int nodeI, Node *parent, Partie *partie, Case *goal) {
     Node *node = &open_node[nodeI];
-    return get_g_cost(parent, partie, node) + manhattan_distance(node->node_case, partie->pacman.case_pacman, partie);
+    return get_g_cost(parent, partie, node) + manhattan_distance(node->node_case, goal, partie);
 }
 
 int get_cheapest_node() {
@@ -287,10 +293,10 @@ int get_g_cost(Node *parent, Partie *partie, Node *neightbour) {
     return parent->g_cost + 1;
 }
 
-void set_cost(Node *node, Node *parent, Partie *p, int i) {
+void set_cost(Node *node, Node *parent, Partie *p, int i, Case *goal) {
     node->g_cost = get_g_cost(parent, p, node);
 
-    node->h_cost = manhattan_distance(node->node_case, p->pacman.case_pacman, p);
+    node->h_cost = manhattan_distance(node->node_case, goal, p);
     if (i) node->h_cost *= -1;
 
     node->f_cost = node->h_cost + node->g_cost;

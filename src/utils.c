@@ -1,6 +1,9 @@
+#include "utils.h"
+#include "collisions.h"
 #include "display.h"
 
 
+direction get_oppos(direction direction);
 
 Point get_point(const Case *c) {
     return (Point) {c->x * PLATEAU_BLOCK_TAILLE, c->y * PLATEAU_BLOCK_TAILLE};
@@ -54,7 +57,7 @@ int meme_case(Case *a, Case *b) {
     return (a->y == b->y && a->x == b->x);
 }
 
-int dir_from_to(Case *a, Case *b, Partie *p) {
+direction dir_from_to(Case *a, Case *b, Partie *p) {
     int x = a->x - b->x;
     int y = a->y - b->y;
 
@@ -73,4 +76,17 @@ int dir_from_to(Case *a, Case *b, Partie *p) {
     if (a->y == p->ymax - 1 && b->x == 0) return DIR_HAUT;
 
     return -2; //ne devrais jamais arriver
+}
+
+direction get_oppos(direction direction) {
+    switch (direction) {
+        case DIR_HAUT:
+            return DIR_BAS;
+        case DIR_DROITE:
+            return DIR_GAUCHE;
+        case DIR_BAS:
+            return DIR_HAUT;
+        case DIR_GAUCHE:
+            return DIR_DROITE;
+    }
 }

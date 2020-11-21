@@ -5,6 +5,8 @@
 
 //region plateau
 #define PLATEAU_BLOCK_TAILLE 32
+
+#define MAX_SCORES 30
 //endregion
 
 //region Fantome Types
@@ -49,6 +51,7 @@ typedef struct {
     int wall;
     type_gomme gomme; // 0 rien, 1 pac gomme, 2 bonus
     //int pas;
+    int porte;
 } Case;
 
 // pacman
@@ -57,7 +60,6 @@ typedef struct {
     direction direction;
     Pos position; //pos EN PIXEL
     int oob;
-    int bonus_timer;
 } Pacman;
 //endregion
 
@@ -67,6 +69,9 @@ typedef struct {
     Pos position;
     type_fantome type;
     int oob;
+    int speed;
+    int alive;
+    int sorti;
 } Fantome;
 
 // Une partie
@@ -80,6 +85,9 @@ typedef struct {
     Fantome fantomes[NBFANTOMES];
     int max_gommes;
     int bonus_timer;
+    Case *spawn_fantome[NBFANTOMES];
+    int points;
+    int vies;
 } Partie;
 //endregion
 

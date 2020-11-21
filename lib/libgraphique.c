@@ -74,16 +74,11 @@ void ouvrir_fenetre(int largeur, int hauteur) {
 // terminer le programme
 void fermer_fenetre(){
     SDL_Quit();
-    exit(0);
 }
 
 // teste si la fin du programme a été demandée et le termine si nécessaire
-void _test_arret() {
-    if ((lastevent.type == SDL_QUIT) || 
-            ( (lastevent.type == SDL_KEYDOWN )
-              && (lastevent.key.keysym.sym == SDLK_ESCAPE)) 
-       )
-        fermer_fenetre() ;
+int _test_arret() {
+    return lastevent.type == SDL_QUIT;
 }
 
 

@@ -6,6 +6,7 @@
 //region Fonctions privées
 
 extern int window_width, window_height;
+extern int plateau_width, plateau_height;
 
 void dessiner_fantome_bleu(const Fantome *fantome);
 
@@ -49,7 +50,11 @@ void dessiner_plateau(const Partie *p) {
 
 
 void dessiner_case(const Case *c) {
-    if (c->wall) {
+
+    if (c->porte) {
+        remplir_case(c, COLOR_BG);
+        dessiner_rectangle(get_point(c), PLATEAU_BLOCK_TAILLE, PLATEAU_BLOCK_TAILLE / 3, COLOR_WALL);
+    } else if (c->wall) {
         remplir_case(c, COLOR_WALL);
     } else {
 
@@ -63,6 +68,8 @@ void dessiner_case(const Case *c) {
                 break;
             case GOMME_BONUS:
                 dessiner_gomme_bonus(c);
+                break;
+            case GOMME_EMPTY:
                 break;
         }
     }
@@ -78,6 +85,10 @@ void dessiner_rect_cases(const Partie *p, int cx, int cy) {
     }
 }
 
+void dessiner_fantome_dead(const Fantome *fantome) {
+    dessiner_disque(to_point(fantome->position), SIZE_FANTOME, white);
+}
+
 void dessiner_entities(Partie *partie) {
 
     dessiner_rect_cases(partie, partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
@@ -91,17 +102,77 @@ void dessiner_entities(Partie *partie) {
 
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
-        if (partie->pacman.bonus_timer > 0) {
-            dessiner_fantome_bleu(fantome);
+        if (fantome->alive) {
+            if (partie->bonus_timer > 0) {
+                dessiner_fantome_bleu(fantome);
+            } else {
+                dessiner_fantome(fantome);
+            }
         } else {
-            dessiner_fantome(fantome);
+            dessiner_fantome_dead(fantome);
         }
     }
 }
 
 void dessiner_fantome_bleu(const Fantome *fantome) {
-    dessiner_fantome(fantome); //todo
+    dessiner_disque(to_point(fantome->position), SIZE_FANTOME, bleumarine);
 }
+
+const int vie_radius = 10;
+
+const int vie_padding = 5;
+
+void dessiner_vies(int vies, Couleur color) {
+
+    int ycent = plateau_height + ((window_height - plateau_height) / 2);
+
+    Point center = {((window_height - plateau_height) / 2), ycent};
+
+    //Point center = {corner.x + vie_radius,corner.y + vie_radius};
+
+    for (int i = 0; i < vies; ++i) {
+        dessiner_disque(center, vie_radius, color);
+
+        center.x += vie_radius * 2 + vie_padding;
+    }
+
+}
+
+void dessiner_texte_niveau(Partie *partie) {
+    char texte[30];
+    sprintf(texte, "Niveau %d", partie->level);
+
+    int padding = 5;
+
+    Point taille = taille_texte(texte, 15);
+
+    Point corner = {window_width - taille.x - padding, plateau_height + padding};
+
+    dessiner_rectangle((Point) {window_width - 30, plateau_height + 5}, 30, window_height - plateau_height, black);
+
+    afficher_texte(texte, 15, corner, blue);
+}
+
+void dessiner_all_scores(char pString[MAX_SCORES][3], int score[MAX_SCORES], int nbscores) {
+    int paddingy = 50;
+    int paddingx = 20;
+
+    Point corner = {plateau_width + paddingx,
+                    0 + paddingy};
+
+    for (int i = 0; i < nbscores; ++i) {
+        char text[20];
+
+        sprintf(text, "[%c%c%c] %d", pString[i][0], pString[i][1], pString[i][2], score[i]);
+
+        corner.y += 20;
+
+        afficher_texte(text, 15, corner, black);
+    }
+
+
+}
+
 
 void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
 
@@ -110,7 +181,7 @@ void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
     twidth = point.x;
     theight = point.y;
 
-    Point center = (Point) {window_width / 2, window_height / 2};
+    Point center = (Point) {plateau_width / 2, plateau_height / 2};
 
     int padding = 5;
     Point tcoin = (Point) {center.x - (twidth / 2) - 2, center.y - (theight / 2) - padding};
@@ -121,16 +192,33 @@ void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
     afficher_texte(text, pt, tcoin, fgcolor);
 }
 
+
+void dessiner_rectangle_score(Partie *partie) {
+
+    int padding = 5;
+
+    Point coin = {plateau_width + padding, padding};
+
+    dessiner_rectangle(coin, (window_width - plateau_width - padding * 2), plateau_height - padding, COLOR_SCORE_BG);
+
+}
+
 void dessiner_score(Partie *partie) {
 
     char text[30];
-    sprintf(text, "Points : %d", partie->max_gommes - partie->gomme_restant);
+    sprintf(text, "Points : %d", partie->points);
     int taille = 15;
-    int padding = 5;
+    int paddingx = 5;
+    int paddingy = 15;
     Point ttext = taille_texte(text, taille);
-    Point corner = {window_width - ttext.x - padding,
-                    0 + padding};
-    dessiner_rectangle(corner, ttext.x, ttext.y, COLOR_WALL);
-    afficher_texte(text, taille, corner, yellow);
+
+    int scoremid = plateau_width + ((window_width - plateau_width) / 2);
+
+    Point corner = {scoremid - (ttext.x / 2) - paddingx,
+                    0 + paddingy};
+    dessiner_rectangle(corner, ttext.x, ttext.y, COLOR_SCORE_BG);
+    afficher_texte(text, taille, corner, black);
 }
+
+
 

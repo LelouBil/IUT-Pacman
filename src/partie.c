@@ -51,8 +51,11 @@ Partie load_partie_template(char *fichier) {
     //p.fantomes = malloc(NBFANTOMES * sizeof(Fantome));
 
     p.gomme_restant = 0;
+    p.bonus_timer = 0;
     p.max_gommes = 0;
     p.level = 0;
+    p.vies = 0;
+    p.points = 0;
 
     // LECTURE DES LIGNES DU PLAN
     y = 0;
@@ -99,6 +102,10 @@ Partie load_partie_template(char *fichier) {
                     p.gomme_restant++;
                     p.max_gommes++;
                     break;
+                case '-':
+                    p.plateau[x][y].wall = 1;
+                    p.plateau[x][y].porte = 1;
+                    break;
                 case '*':
                     p.plateau[x][y].wall = 1;
                     break;
@@ -107,7 +114,6 @@ Partie load_partie_template(char *fichier) {
                     p.pacman.position = get_case_center(p.pacman.case_pacman);
                     p.pacman.direction = DIR_HAUT;
                     p.pacman.oob = 0;
-                    p.pacman.bonus_timer = 0;
                     break;
                 case 'F':
 
@@ -121,6 +127,10 @@ Partie load_partie_template(char *fichier) {
                     p.fantomes[nbf].position = get_case_center(&p.plateau[x][y]);
                     p.fantomes[nbf].type = nbf;
                     p.fantomes[nbf].oob = 0;
+                    p.fantomes[nbf].alive = 1;
+                    p.spawn_fantome[nbf] = p.fantomes[nbf].case_fantome;
+                    p.fantomes[nbf].speed = 1;
+                    p.fantomes[nbf].sorti = 0;
                     nbf++;
 
                     break;
@@ -171,7 +181,11 @@ Partie clone_partie(Partie *p) {
     partie_data.xmax = p->xmax;
     partie_data.ymax = p->ymax;
     partie_data.gomme_restant = p->gomme_restant;
+    partie_data.max_gommes = p->max_gommes;
+
     partie_data.level = p->level;
+    partie_data.points = 0;
+    partie_data.bonus_timer = p->bonus_timer;
 
     partie_data.plateau = malloc(partie_data.xmax * sizeof(Case *));
 
@@ -187,10 +201,13 @@ Partie clone_partie(Partie *p) {
     for (int i = 0; i < NBFANTOMES; ++i) {
         partie_data.fantomes[i] = p->fantomes[i];
         partie_data.fantomes[i].case_fantome = &(partie_data.plateau[p->fantomes[i].case_fantome->x][p->fantomes[i].case_fantome->y]);
+        partie_data.spawn_fantome[i] = &(partie_data.plateau[p->spawn_fantome[i]->x][p->spawn_fantome[i]->y]);
     }
 
     partie_data.pacman = p->pacman;
-    partie_data.pacman.case_pacman = &partie_data.plateau[p->pacman.case_pacman->x][p->pacman.case_pacman->x];
-    partie_data.pacman.bonus_timer = p->pacman.bonus_timer;
+    partie_data.vies = p->vies;
+    partie_data.pacman.direction = DIR_HAUT;
+    partie_data.pacman.case_pacman = &partie_data.plateau[p->pacman.case_pacman->x][p->pacman.case_pacman->y];
+
     return partie_data;
 }

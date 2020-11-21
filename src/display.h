@@ -10,6 +10,8 @@
 #define COLOR_GOMME yellow
 #define COLOR_BONUS yellow
 
+#define COLOR_SCORE_BG wheat
+
 
 static const int COLOR_FANTOMES[NBFANTOMES] = {red, pink, cyan, orange};
 
@@ -38,6 +40,14 @@ void remplir_case(const Case *c, int color);
 void dessiner_entities(Partie *partie);
 
 void dessiner_score(Partie *partie);
+
+void dessiner_texte_niveau(Partie *partie);
+
+void dessiner_rectangle_score(Partie *partie);
+
+void dessiner_all_scores(char pString[MAX_SCORES][3], int score[MAX_SCORES], int nbscores);
+
+void dessiner_vies(int vies, Couleur color);
 
 
 void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor);
