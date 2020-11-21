@@ -2,11 +2,11 @@
 #include "utils.h"
 #include "utils.h"
 
-Partie charge_plan(char *fichier) {
-    Char_Partie p;
+Partie load_partie_template(char *fichier) {
+    Partie p;
     FILE *f = fopen(fichier, "r");
     p.plateau = NULL;
-    int res, l, c;
+    int res, y, x;
     int nbf;        // Nb de fantômes trouvés sur le plan
     int nbb;        // Nb de bonus trouvés sur le plan
     char ch;
@@ -17,111 +17,139 @@ Partie charge_plan(char *fichier) {
     }
 
     // Lecture des dimensions du plan en en-tête
-    res = fscanf(f, "%d %d\n", &p.L, &p.C);
+    res = fscanf(f, "%d %d\n", &p.ymax, &p.xmax);
 
 
     // Si on n'a pas pu lire deux entiers ou s'ils sont incorrects
-    if (res != 2 || p.C < 2 || p.L < 2 || p.C > 800 || p.L > 600) {
+    if (res != 2 || p.xmax < 2 || p.ymax < 2 || p.xmax > 800 || p.ymax > 600) {
         printf("Dimensions du tableau lues dans '%s' incorrectes\n", fichier);
         fclose(f);
         exit(0);
     }
 
-    printf("Dimensions lues: %d x %d\n", p.L, p.C);
+    printf("Dimensions lues: %d x %d\n", p.ymax, p.xmax);
 
     // ALLOCATION DYNAMIQUE
-    // Allocation du tableau de *L pointeurs sur lignes
-    p.plateau = (char **) malloc(p.L * sizeof(char *));
+    // Allocation du tableau de *xmax pointeurs sur lignes
+    p.plateau = malloc(p.xmax * sizeof(Case *));
     if (p.plateau == NULL) {
         printf("Allocation dynamique impossible\n");
         fclose(f);
         exit(0);
     }
 
-    // Allocation des tableaux de *C caractères
-    for (l = 0; l != p.L; l++) {
-        p.plateau[l] = (char *) malloc(p.C * sizeof(char));
-        if (p.plateau[l] == NULL) {
+    // Allocation des tableaux de *ymax Case
+    for (y = 0; y != p.xmax; y++) {
+        p.plateau[y] = malloc(p.ymax * sizeof(Case));
+        if (p.plateau[y] == NULL) {
             printf("Allocation dynamique impossible\n");
             fclose(f);
             exit(0);
         }
     }
 
+    //p.fantomes = malloc(NBFANTOMES * sizeof(Fantome));
+
+    p.gomme_restant = 0;
+    p.max_gommes = 0;
+    p.level = 0;
 
     // LECTURE DES LIGNES DU PLAN
-    l = 0;
+    y = 0;
     res = 0;
     nbf = 0;
     nbb = 0;
     while (res != EOF) // Lecture de chaque ligne
     {
-        c = 0;
+        x = 0;
         while (1) {
             res = fscanf(f, "%c", &ch);
             if (res == EOF)
                 break;
 
-            if (c > p.C) // Si trop de colonnes...
+            if (x > p.xmax) // Si trop de colonnes...
             {
-                printf("Ligne %d colonne %d: trop de colonnes\n", l, c);
+                printf("Ligne %d colonne %d: trop de colonnes\n", y, x);
                 fclose(f);
                 exit(0);
             }
 
-            if (c == p.C) // Si fin de ligne supposée...
+            if (x == p.xmax) // Si fin de ligne supposée...
             {
                 if (ch == '\n') // Si fin de ligne réelle, on quitte la boucle
                 {
                     break;
                 } else // Sinon trop de caractères
                 {
-                    printf("Ligne %d: trop de caractères\n", l);
+                    printf("Ligne %d: trop de caractères\n", y);
                     fclose(f);
                     exit(0);
                 }
             }
 
-            // ...sinon, nous ne sommes pas à la fin de la ligne.
-            // Si on lit un caractère interdit...
+            p.plateau[x][y].x = x;
+            p.plateau[x][y].y = y;
+            p.plateau[x][y].wall = 0;
+            p.plateau[x][y].gomme = 0;
 
-            if (ch != '.' && ch != ' ' && ch != '*' && ch != 'P' && ch != 'F' && ch != 'B' && ch != 'C') {
-                if (ch == '\n') // Si c'est un saut de ligne
-                    printf("Ligne %d: trop peu de caractères\n", l);
-                else
-                    printf("Ligne %d: caractère '%c' incorrect\n", l, ch);
-                fclose(f);
-                exit(0);
-            }
 
-            if (ch == 'P') {
-                p.pacman.x = l;
-                p.pacman.y = c;
-            } else if (ch == 'F') {
-                if (nbf > NBFANTOMES) {
-                    printf("Ligne %d:  un fantôme de trop!\n", l);
+            switch (ch) {
+                case '.':
+                    p.plateau[x][y].gomme = 1;
+                    p.gomme_restant++;
+                    p.max_gommes++;
+                    break;
+                case '*':
+                    p.plateau[x][y].wall = 1;
+                    break;
+                case 'P':
+                    p.pacman.case_pacman = &p.plateau[x][y];
+                    p.pacman.position = get_case_center(p.pacman.case_pacman);
+                    p.pacman.direction = DIR_HAUT;
+                    p.pacman.oob = 0;
+                    p.pacman.bonus_timer = 0;
+                    break;
+                case 'F':
+
+                    if (nbf > NBFANTOMES) {
+                        printf("Ligne %d:  un fantôme de trop!\n", y);
+                        fclose(f);
+                        exit(0);
+                    }
+                    p.fantomes[nbf].case_fantome = &p.plateau[x][y];
+                    p.fantomes[nbf].direction = 0;
+                    p.fantomes[nbf].position = get_case_center(&p.plateau[x][y]);
+                    p.fantomes[nbf].type = nbf;
+                    p.fantomes[nbf].oob = 0;
+                    nbf++;
+
+                    break;
+                case 'B':
+                    p.plateau[x][y].gomme = GOMME_BONUS;
+                    nbb++;
+                    break;
+                case ' ':
+                    break;
+                default:
+                    if (ch == '\n') // Si c'est un saut de ligne
+                        printf("Ligne %d: trop peu de caractères\n", y);
+                    else
+                        printf("Ligne %d: caractère '%c' incorrect\n", y, ch);
                     fclose(f);
                     exit(0);
-                }
-                p.fantomes[nbf].x = l;
-                p.fantomes[nbf].y = c;
+            }
 
-                nbf++;
-            } else if (ch == 'B')
-                nbb++;
 
-            p.plateau[l][c] = ch; // Ecriture dans le plan
-
-            c++; // caractère suivant
+            x++; // caractère suivant
         }
-        l++; // ligne suivante
+        y++; // ligne suivante
     }
 
     fclose(f); // Fermeture du flux de lecture du fichier
 
     // Si à la lecture de EOF on n'est pas sur la *V+1 ème ligne...
-    if (l != p.L + 1) {
-        printf("Ligne %d: nb de lignes incorrect\n", l);
+    if (y != p.ymax + 1) {
+        printf("Ligne %d: nb de lignes incorrect\n", y);
         exit(0);
     }
 
@@ -132,67 +160,37 @@ Partie charge_plan(char *fichier) {
         exit(0);
     }
 
-    // Si pas de bonus....
-    if (nbb == 0) {
-        printf("Aucun bonus sur le plan!\n");
-        fclose(f);
-        exit(0);
-    }
-    p.nbbonus = nbb;
 
-    return convert_partie(p);
+    return p;
 }
 
-Partie convert_partie(Char_Partie charPartie) {
+
+Partie clone_partie(Partie *p) {
     Partie partie_data;
 
-    partie_data.xmax = charPartie.C;
-    partie_data.ymax = charPartie.L;
-    partie_data.gomme_restant = 0;
+    partie_data.xmax = p->xmax;
+    partie_data.ymax = p->ymax;
+    partie_data.gomme_restant = p->gomme_restant;
+    partie_data.level = p->level;
 
-    partie_data.plateau = calloc(partie_data.xmax, sizeof(Case *));
+    partie_data.plateau = malloc(partie_data.xmax * sizeof(Case *));
 
-
-
-    //x et y inversé parce que on pase d'un tableau Colonnes par Lignes a Lignes par colonnes
 
     for (int x = 0; x < partie_data.xmax; ++x) {
-        partie_data.plateau[x] = calloc(partie_data.ymax, sizeof(Case));
+        partie_data.plateau[x] = malloc(partie_data.ymax * sizeof(Case));
         for (int y = 0; y < partie_data.ymax; ++y) {
-            int gomme = GOMME_EMPTY;
-            if (charPartie.plateau[y][x] == '.') {
-                gomme = GOMME_PAC;
-                partie_data.gomme_restant++;
-            } else { if (charPartie.plateau[y][x] == 'B') gomme = GOMME_BONUS; }
-            partie_data.plateau[x][y] = (Case) {x, y, charPartie.plateau[y][x] == '*', gomme};
+            partie_data.plateau[x][y] = p->plateau[x][y];
         }
     }
 
-    partie_data.bonus_timer = 0;
-
-
-    int fantome_name = FANTOME_BLINKY;
 
     for (int i = 0; i < NBFANTOMES; ++i) {
-        Pos fantome_pos = charPartie.fantomes[i];
-        Case *c = &partie_data.plateau[fantome_pos.y][fantome_pos.x];
-        partie_data.fantomes[i] = (Fantome) {c, 0, get_case_center(c), fantome_name, 0};
-        fantome_name++;
+        partie_data.fantomes[i] = p->fantomes[i];
+        partie_data.fantomes[i].case_fantome = &(partie_data.plateau[p->fantomes[i].case_fantome->x][p->fantomes[i].case_fantome->y]);
     }
 
-    partie_data.pacman.case_pacman = &partie_data.plateau[charPartie.pacman.y][charPartie.pacman.x];
-    partie_data.pacman.position = get_case_center(partie_data.pacman.case_pacman);
-    partie_data.pacman.direction = DIR_HAUT;
-    partie_data.pacman.oob = 0;
-
-    //libération de l'ancienne struct partie
-
-    for (int i = 0; i < charPartie.C; ++i) {
-        free(charPartie.plateau[i]);
-    }
-
-
-    free(charPartie.plateau);
-
+    partie_data.pacman = p->pacman;
+    partie_data.pacman.case_pacman = &partie_data.plateau[p->pacman.case_pacman->x][p->pacman.case_pacman->x];
+    partie_data.pacman.bonus_timer = p->pacman.bonus_timer;
     return partie_data;
 }

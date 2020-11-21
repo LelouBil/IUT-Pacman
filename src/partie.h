@@ -42,21 +42,6 @@ typedef struct {
     int y;
 } Pos;
 
-// Structure Char_Partie:  permet de stocker les paramètres d'une partie en char
-typedef struct {
-    char **plateau; // le tableau de caractères contenant le plateau de jeu
-
-    int L; // le nb de lignes du plateau de jeu
-    int C; // le nb de colonne du plateau de jeu
-
-    Pos pacman; // la position de Pacman dans le plateau
-
-    Pos fantomes[NBFANTOMES]; // les positions de chaque fantôme
-
-    int nbbonus; // le nombre de bonus restants à manger
-
-} Char_Partie;
-
 
 // Une case
 typedef struct {
@@ -90,9 +75,10 @@ typedef struct {
     int xmax;
     int ymax;
     Pacman pacman;
-    Fantome fantomes[NBFANTOMES];
     int gomme_restant;
     int level;
+    Fantome fantomes[NBFANTOMES];
+    int max_gommes;
     int bonus_timer;
 } Partie;
 //endregion
@@ -101,9 +87,9 @@ typedef struct {
 
 //region PROTOTYPES
 // charge_plan : lit un fichier contenant un plateau de jeu et le charge en mémoire, dans le champ 'plateau' d'une Partie
-Partie charge_plan(char *fichier);
+Partie load_partie_template(char *fichier);
 
-// convert_partie : convertit Char_Partie Partie
-Partie convert_partie(Char_Partie charPartie);
+
+Partie clone_partie(Partie *p);
 //endregion
 

@@ -16,33 +16,15 @@ int check_game_end(Partie *partie);
 
 void levels_loop();
 
-Partie load_game_data(char *const plan_file) {
-    printf("Chargement du plan...\n");
-    Partie partie = charge_plan(plan_file);
 
-    //region debug
-#if DEBUG == 1
 
-    printf("Affichage du plan...\n");
-    for (int y = 0; y != partie.ymax; y++) { // ligne par ligne vu que terminal
-        for (int x = 0; x != partie.xmax; x++)
-            printf("%c", partie.plateau[x][y].wall ? '*' : ' ');
-        printf("\n");
-    }
-#endif
-//endregion
-
-    return partie;
-}
-
-Partie init_graphique(const Partie *partie) {
+void init_graphique(int xmax, int ymax) {
     printf("Ouverture fenetre\n");
 
-    window_width = (*partie).xmax * PLATEAU_BLOCK_TAILLE;
-    window_height = (*partie).ymax * PLATEAU_BLOCK_TAILLE;
+    window_width = xmax * PLATEAU_BLOCK_TAILLE;
+    window_height = ymax * PLATEAU_BLOCK_TAILLE;
     ouvrir_fenetre(window_width, window_height);
 
-    return (*partie);
 }
 
 int pathfinding_debug = 0;
@@ -67,18 +49,20 @@ void levels_loop() {
     int exitcode = GAME_WIN;
     char leveltext[50];
 
-    Partie p = load_game_data("data/test.txt");
+    Partie partieTemplate = load_partie_template("data/test.txt");
 
-    init_graphique(&p);
+
+    init_graphique(partieTemplate.xmax, partieTemplate.ymax);
+
 
     while (exitcode == GAME_WIN) {
 
-        Partie partie = load_game_data("data/test.txt");
+        //Partie partieTemplate;
 
-        partie.level = ++level;
+        partieTemplate.level = ++level;
         sprintf(leveltext, "Niveau %d", level);
 
-        dessiner_plateau(&partie);
+        dessiner_plateau(&partieTemplate);
 
         reset_timers();
 
@@ -88,11 +72,11 @@ void levels_loop() {
 
         attendre_touche();
 
-        dessiner_plateau(&partie);
+        dessiner_plateau(&partieTemplate);
 
-        dessiner_entities(&partie);
+        dessiner_entities(&partieTemplate);
 
-        exitcode = game_loop(&partie);
+        exitcode = game_loop(&partieTemplate);
     }
 
     if (exitcode == GAME_LOST) {
@@ -130,8 +114,13 @@ int game_loop(Partie *partie) {
         }
 
         dessiner_entities(partie);
+        dessiner_score(partie);
 
         //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
+
+        if (partie->pacman.bonus_timer > 0) {
+            partie->pacman.bonus_timer -= framerate;
+        }
 
         actualiser();
 

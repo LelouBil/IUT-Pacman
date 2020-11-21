@@ -35,7 +35,9 @@ void dessiner_debug_paththfinding_case(Pos *c, int current_step, int max_step);
 
 void remplir_case(const Case *c, int color);
 
-void dessiner_entities(const Partie *partie);
+void dessiner_entities(Partie *partie);
+
+void dessiner_score(Partie *partie);
 
 
 void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor);

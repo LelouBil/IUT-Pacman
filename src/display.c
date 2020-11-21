@@ -5,6 +5,10 @@
 
 //region Fonctions privées
 
+extern int window_width, window_height;
+
+void dessiner_fantome_bleu(const Fantome *fantome);
+
 void remplir_case(const Case *c, int color) {
     dessiner_rectangle(get_point(c), PLATEAU_BLOCK_TAILLE, PLATEAU_BLOCK_TAILLE, color);
 }
@@ -74,7 +78,7 @@ void dessiner_rect_cases(const Partie *p, int cx, int cy) {
     }
 }
 
-void dessiner_entities(const Partie *partie) {
+void dessiner_entities(Partie *partie) {
 
     dessiner_rect_cases(partie, partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
     for (int i = 0; i < NBFANTOMES; ++i) {
@@ -87,12 +91,20 @@ void dessiner_entities(const Partie *partie) {
 
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
-        dessiner_fantome(fantome);
+        if (partie->pacman.bonus_timer > 0) {
+            dessiner_fantome_bleu(fantome);
+        } else {
+            dessiner_fantome(fantome);
+        }
     }
 }
 
+void dessiner_fantome_bleu(const Fantome *fantome) {
+    dessiner_fantome(fantome); //todo
+}
+
 void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
-    extern int window_width, window_height;
+
     int twidth, theight;
     Point point = taille_texte(text, pt);
     twidth = point.x;
@@ -107,5 +119,18 @@ void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
 
     dessiner_rectangle(bcoin, twidth + padding, theight + padding, bgcolor);
     afficher_texte(text, pt, tcoin, fgcolor);
+}
+
+void dessiner_score(Partie *partie) {
+
+    char text[30];
+    sprintf(text, "Points : %d", partie->max_gommes - partie->gomme_restant);
+    int taille = 15;
+    int padding = 5;
+    Point ttext = taille_texte(text, taille);
+    Point corner = {window_width - ttext.x - padding,
+                    0 + padding};
+    dessiner_rectangle(corner, ttext.x, ttext.y, COLOR_WALL);
+    afficher_texte(text, taille, corner, yellow);
 }
 
