@@ -12,6 +12,10 @@
 
 direction path_init(Case *start, Partie *p, int avoid, Case *goal, int i);
 
+int manhattan_distance(const Case *aCase, const Case *b, const Partie *p);
+
 direction path_panic(Case *start, Partie *p, int original_dir);
 
 int get_case_color(const Case *c);
+
+int manhattan_distance_no_rollover(const Case *aCase, const Case *b, const Partie *p);

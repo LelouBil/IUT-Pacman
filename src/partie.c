@@ -94,6 +94,7 @@ Partie load_partie_template(char *fichier) {
             p.plateau[x][y].y = y;
             p.plateau[x][y].wall = 0;
             p.plateau[x][y].gomme = 0;
+            p.plateau[x][y].porte = 0;
 
 
             switch (ch) {
@@ -131,6 +132,7 @@ Partie load_partie_template(char *fichier) {
                     p.spawn_fantome[nbf] = p.fantomes[nbf].case_fantome;
                     p.fantomes[nbf].speed = 1;
                     p.fantomes[nbf].sorti = 0;
+                    p.fantomes[nbf].flag = 0;
                     nbf++;
 
                     break;

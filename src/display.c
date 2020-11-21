@@ -195,7 +195,7 @@ void dessiner_texte_center(char *text, int pt, int bgcolor, int fgcolor) {
 
 void dessiner_rectangle_score(Partie *partie) {
 
-    int padding = 5;
+    int padding = 0;
 
     Point coin = {plateau_width + padding, padding};
 

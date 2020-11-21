@@ -103,17 +103,30 @@ void levels_loop() {
 
     dessiner_all_scores(pseudos, scores, nbscores);
 
+    Partie partie;
+
 
     while (vies > 0 && exitcode != GAME_QUIT) {
 
-        Partie partie = clone_partie(&partieTemplate);
+        if (exitcode == GAME_WIN) {
+            partie = clone_partie(&partieTemplate);
+        } else {
+            Partie newPartie = clone_partie(&partieTemplate);
+            for (int x = 0; x < newPartie.xmax; ++x) {
+                for (int y = 0; y < newPartie.ymax; ++y) {
+                    newPartie.plateau[x][y].gomme = partie.plateau[x][y].gomme;
+                }
+            }
+            newPartie.gomme_restant = partie.gomme_restant;
+            partie = newPartie;
+        }
 
         printf("Pacman pos %d %d\n", partie.pacman.position.x, partie.pacman.position.y);
 
         partie.level = ++level;
         partie.points = score;
         partie.vies = vies;
-        partie.gomme_restant = 20;
+        //partie.gomme_restant = 20;
         sprintf(leveltext, "Niveau %d", level);
 
 
@@ -145,6 +158,8 @@ void levels_loop() {
             dessiner_texte_center(texte, 20, red, black);
             actualiser();
             while (attendre_touche() != SDLK_RETURN);
+        } else if (exitcode == GAME_WIN) {
+            score += 500;
         }
     }
 
@@ -195,6 +210,17 @@ int game_loop(Partie *partie) {
 
 
         dessiner_entities(partie);
+        for (int i = 0; i < NBFANTOMES; ++i) {
+            if (partie->pacman.oob || partie->fantomes[i].oob
+                || partie->pacman.case_pacman->x == partie->xmax - 1
+                || partie->pacman.case_pacman->y == partie->ymax - 1
+                || partie->fantomes[i].case_fantome->x == partie->xmax - 1
+                || partie->fantomes[i].case_fantome->y == partie->ymax - 1) {
+                dessiner_rectangle_score(partie);
+                dessiner_all_scores(pseudos, scores, nbscores);
+                break;
+            }
+        }
         dessiner_score(partie);
 
         //printf("Pacman case %d, %d\n", partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
@@ -221,13 +247,18 @@ void swap(int *xp, int *yp) {
 
 void save_score(int score) {
 
-    if (nbscores > 0 && nbscores >= MAX_SCORES && score <= scores[nbscores - 1]) return; //todo si pas place
+    if (nbscores > 0 && nbscores >= MAX_SCORES && score <= scores[nbscores - 1]) return;
 
     dessiner_texte_center("     Regardez le terminal     ", 20, gray, blue);
     actualiser();
     printf("Veuillez entrer votre pseudo (3 caracteres) :");
     char pseudo[3];
     scanf("%c%c%c", &pseudo[0], &pseudo[1], &pseudo[2]);
+    for (int i = 0; i < 3; ++i) {
+        if (!isalnum(pseudo[i])) {
+            pseudo[i] = ' ';
+        }
+    }
     fermer_fenetre();
     printf("Votre pseudo est [%c%c%c]\n", pseudo[0], pseudo[1], pseudo[2]);
 

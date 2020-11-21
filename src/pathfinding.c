@@ -322,3 +322,9 @@ int manhattan_distance(const Case *aCase, const Case *b, const Partie *p) {
 
     return dx + dy;
 }
+
+int manhattan_distance_no_rollover(const Case *aCase, const Case *b, const Partie *p) {
+    int walk_mhdx = abs(aCase->x - b->x);
+    int walk_mhdy = abs(aCase->y - b->y);
+    return walk_mhdx + walk_mhdy;
+}

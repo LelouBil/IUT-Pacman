@@ -54,6 +54,7 @@ Pos dir_to_vector(int key) {
 }
 
 int meme_case(Case *a, Case *b) {
+    if (a == NULL || b == NULL) return 0;
     return (a->y == b->y && a->x == b->x);
 }
 

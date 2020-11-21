@@ -72,6 +72,7 @@ typedef struct {
     int speed;
     int alive;
     int sorti;
+    int flag;
 } Fantome;
 
 // Une partie
