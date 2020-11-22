@@ -4,19 +4,19 @@
 #include "utils.h"
 #include "display.h"
 
-/* pathfinding en A*
+/* pathfinding avec algorithme A*
  *
- * il est utilise la technique du path finiding en etoile :
- * elle consiste a calculers plusieurs score pour chaque noeuds voisin attegnable
+ * 
+ * il consiste a calculers plusieurs poids pour chaque noeuds voisin attegnable
  *
- * Les scores sont les suivants:
- * score h : distance manhattan entre le noeud et la destination (fixe)
+ * Les poids sont les suivants:
+ * score h : distance manhattan entre le noeud et la destination 
  * scord g : distance la plus courte en suivant des noeuds de debut au noeud courant
  * score f : somme des scores g et h
  *
  * le pathfiniding A* preferera les noeud avec le plus faible score f
  *
- * lorsqu un chemin est trouve on peut le retracer grace a la propriete noeud parent de noeud
+ * lorsqu un chemin est trouve on peut le retracer grace a la propriete parent de noeud
  */
 
 //cas de sortie possible du path finder

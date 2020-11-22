@@ -279,7 +279,7 @@ void save_score(int score) {
     scanf("%c%c%c", &pseudo[0], &pseudo[1], &pseudo[2]);
     for (int i = 0; i < 3; ++i) {
         if (!isalnum(pseudo[i])) { // on filtre pour les caracteres speciaux, genre tab ou \n
-            pseudo[i] = ' ';
+            pseudo[i] = '*';
         }
     }
 

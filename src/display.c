@@ -130,7 +130,7 @@ const int vie_radius = 10;
 const int vie_padding = 5;
 
 void dessiner_vies(int vies, Couleur color) {
-    // TODO
+    // calcule le centre en hauteure de la zone en dessous du plateau
     int ycent = plateau_height + ((window_height - plateau_height) / 2);
     Point center = {((window_height - plateau_height) / 2), ycent};
 
