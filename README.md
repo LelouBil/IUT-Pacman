@@ -7,21 +7,21 @@ A1 - Celeste Casalotti
 
 ---
 
-##Le jeu
+## Le jeu
 
-###Instruction de lancement
+### Instruction de lancement
 
-###Regles du jeux
+### Regles du jeux
 
 ---
 
-##Le programme
+## Le programme
 
-###fonctions fonctionelles
+### fonctions fonctionelles
 
-1.Intelligence Artificielle
-	-Pathfinder end A-Etoile.
+1. Intelligence Artificielle
+	- Pathfinder end A-Etoile.
 
-###fonctions non fonctionelles
+### fonctions non fonctionelles
 
-###ect...
+### ect...
