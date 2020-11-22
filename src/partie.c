@@ -3,6 +3,7 @@
 #include "utils.h"
 
 Partie load_partie_template(char *fichier) {
+
     Partie p;
     FILE *f = fopen(fichier, "r");
     p.plateau = NULL;
@@ -180,7 +181,7 @@ Partie clone_partie(Partie *p) {
     partie_data.max_gommes = p->max_gommes;
 
     partie_data.level = p->level;
-    partie_data.points = 0;
+    partie_data.points = p->points;
     partie_data.bonus_timer = p->bonus_timer;
 
     partie_data.plateau = malloc(partie_data.xmax * sizeof(Case *));
@@ -196,13 +197,16 @@ Partie clone_partie(Partie *p) {
 
     for (int i = 0; i < NBFANTOMES; ++i) {
         partie_data.fantomes[i] = p->fantomes[i];
+        //on répare les pointeurs
         partie_data.fantomes[i].case_fantome = &(partie_data.plateau[p->fantomes[i].case_fantome->x][p->fantomes[i].case_fantome->y]);
         partie_data.spawn_fantome[i] = &(partie_data.plateau[p->spawn_fantome[i]->x][p->spawn_fantome[i]->y]);
+
     }
 
     partie_data.pacman = p->pacman;
     partie_data.vies = p->vies;
     partie_data.pacman.direction = DIR_HAUT;
+    //reparation du pointeur
     partie_data.pacman.case_pacman = &partie_data.plateau[p->pacman.case_pacman->x][p->pacman.case_pacman->y];
 
     return partie_data;

@@ -34,11 +34,10 @@ typedef enum {
 //region jeu
 #define NBFANTOMES 4 // nombres de fantômes dans les plateaux chargés
 #define BONUS_MAX_TIME 5000 //temps max du mode super pac gomme
-#define VIE_MAX 3
 //endregion
 
 //region STRUCTURES
-// Structure Pos: permet de stocker un couple ligne/colonne
+// Structure Pos: permet de stocker une position
 typedef struct {
     int x;
     int y;
@@ -49,7 +48,7 @@ typedef struct {
 typedef struct {
     int x, y;
     int wall;
-    type_gomme gomme; // 0 rien, 1 pac gomme, 2 bonus
+    type_gomme gomme;
     //int pas;
 } Case;
 
@@ -65,12 +64,12 @@ typedef struct {
 typedef struct {
     Case *case_fantome;
     direction direction;
-    Pos position;
+    Pos position; // pos en pixel
     type_fantome type;
     int oob;
     int speed;
     int alive;
-    int flag;
+    int flag; // utilisié uniquement par clyde
 } Fantome;
 
 // Une partie
@@ -84,7 +83,7 @@ typedef struct {
     Fantome fantomes[NBFANTOMES];
     int max_gommes;
     int bonus_timer;
-    Case *spawn_fantome[NBFANTOMES];
+    Case *spawn_fantome[NBFANTOMES]; // points d'apparition des fantomes
     int points;
     int vies;
 } Partie;
@@ -93,7 +92,8 @@ typedef struct {
 
 
 //region PROTOTYPES
-// charge_plan : lit un fichier contenant un plateau de jeu et le charge en mémoire, dans le champ 'plateau' d'une Partie
+// charge un modele de partie qui va etre dupliqué avant utilisation pour eviter de lire le fichier a chaque niveau
+// normalement appelé une seule fois
 Partie load_partie_template(char *fichier);
 
 

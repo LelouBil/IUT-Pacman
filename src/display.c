@@ -205,13 +205,12 @@ void dessiner_score(Partie *partie) {
     char text[30];
     sprintf(text, "Points : %d", partie->points);
     int taille = 15;
-    int paddingx = 5;
+    int paddingx = 20;
     int paddingy = 15;
     Point ttext = taille_texte(text, taille);
 
-    int scoremid = plateau_width + ((window_width - plateau_width) / 2);
 
-    Point corner = {scoremid - (ttext.x / 2) - paddingx,
+    Point corner = {plateau_width + paddingx,
                     0 + paddingy};
     dessiner_rectangle(corner, ttext.x, ttext.y, COLOR_SCORE_BG);
     afficher_texte(text, taille, corner, black);

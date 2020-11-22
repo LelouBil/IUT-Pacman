@@ -11,3 +11,4 @@
 #define GAME_LOST -1
 #define GAME_QUIT 0
 #define SCORE_FILE "scores.txt"
+#define MAX_VIES 3

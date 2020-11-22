@@ -1,3 +1,5 @@
+#include "timings.h"
+#include "./gameplay.h"
 #include "utils.h"
 #include "collisions.h"
 #include "display.h"
@@ -89,5 +91,34 @@ direction get_oppos(direction direction) {
             return DIR_HAUT;
         case DIR_GAUCHE:
             return DIR_DROITE;
+    }
+}
+
+int dir_from_key(int key) {
+    switch (key) {
+        case SDLK_UP:
+            return DIR_HAUT;
+        case SDLK_DOWN:
+            return DIR_BAS;
+        case SDLK_RIGHT:
+            return DIR_DROITE;
+        case SDLK_LEFT:
+            return DIR_GAUCHE;
+        default:
+            return -1;
+    }
+}
+
+int get_perpendicular(direction dir) {
+    switch (dir) {
+        case DIR_HAUT:
+        case DIR_BAS:
+            return DIR_DROITE;
+
+        case DIR_DROITE:
+        case DIR_GAUCHE:
+            return DIR_HAUT;
+        default:
+            return 0;
     }
 }

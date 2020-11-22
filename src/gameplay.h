@@ -9,4 +9,4 @@
 static const int VITESSE_FANTOME[NBFANTOMES] = {4};
 
 
-void key_events(Partie *partie);
+void pacman_deplace(Partie *partie);
