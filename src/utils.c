@@ -12,10 +12,11 @@ Point get_point(const Case *c) {
 }
 
 Case *get_case_at(const Partie *partie, const Case *c, direction direction) {
+    //retourne le contenu d'une case a partir d une autre case et d une direction
     switch (direction) {
         case DIR_GAUCHE:
-            if (c->x - 1 < 0) return &partie->plateau[partie->xmax - 1][c->y];
-            return &partie->plateau[c->x - 1][c->y];
+            if (c->x - 1 < 0) return &partie->plateau[partie->xmax - 1][c->y]; //cas ou dehors du plateau
+            return &partie->plateau[c->x - 1][c->y]; //sinon
         case DIR_DROITE:
             if (c->x + 1 >= partie->xmax) return &partie->plateau[0][c->y];
             return &partie->plateau[c->x + 1][c->y];
@@ -32,15 +33,18 @@ Case *get_case_at(const Partie *partie, const Case *c, direction direction) {
 
 
 Pos get_case_center(const Case *c) {
+    //retourne une pos de coordonees centre de la case
     return (Pos) {c->x * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2,
                   c->y * PLATEAU_BLOCK_TAILLE + PLATEAU_BLOCK_TAILLE / 2};
 }
 
 Point to_point(Pos p) {
+    //retourne un point à partir des coordonnees d un pos
     return (Point) {p.x, p.y};
 }
 
 Pos dir_to_vector(int key) {
+    //retourn un pos vecteur d une direction
     switch (key) {
         case DIR_HAUT:
             return (Pos) {0, -1};
@@ -56,11 +60,14 @@ Pos dir_to_vector(int key) {
 }
 
 int meme_case(Case *a, Case *b) {
+    //verifie si deux case ont la memme position
     if (a == NULL || b == NULL) return 0;
     return (a->y == b->y && a->x == b->x);
 }
 
 direction dir_from_to(Case *a, Case *b, Partie *p) {
+    //retourne une direction entre deux cases
+
     int x = a->x - b->x;
     int y = a->y - b->y;
 
@@ -82,6 +89,7 @@ direction dir_from_to(Case *a, Case *b, Partie *p) {
 }
 
 direction get_oppos(direction direction) {
+    //retourne oppose d une direction
     switch (direction) {
         case DIR_HAUT:
             return DIR_BAS;

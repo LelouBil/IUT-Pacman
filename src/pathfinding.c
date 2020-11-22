@@ -4,13 +4,30 @@
 #include "utils.h"
 #include "display.h"
 
+/* pathfinding en A*
+ *
+ * il est utilise la technique du path finiding en etoile :
+ * elle consiste a calculers plusieurs score pour chaque noeuds voisin attegnable
+ *
+ * Les scores sont les suivants:
+ * score h : distance manhattan entre le noeud et la destination (fixe)
+ * scord g : distance la plus courte en suivant des noeuds de debut au noeud courant
+ * score f : somme des scores g et h
+ *
+ * le pathfiniding A* preferera les noeud avec le plus faible score f
+ *
+ * lorsqu un chemin est trouve on peut le retracer grace a la propriete noeud parent de noeud
+ */
+
+//cas de sortie possible du path finder
 typedef enum {
     PATH_FOUND,
     PATH_DISTANCE_REACHED,
     PATH_MAX_ITER_REACHED,
-    NO_PATH_FOUND
+    PATH_NOT_FOUND
 } pathcode;
 
+// noeuds du path finding
 typedef struct Node {
     int empty;
     Case *node_case;
@@ -43,19 +60,25 @@ int open_node_index = 0;
 int closed_node_index = 0;
 
 
-Node open_node[array_max];
-Node closed_node[array_max];
+Node open_node[array_max]; //liste des noeuds ouverts
+Node closed_node[array_max]; //liste des noeuds fermes
 
 
 direction path_init(Case *start, Partie *p, int avoid, Case *goal) {
+    //initialisation des outils de path finding
+
+    //cas ou le fantome est sur la meme case que le fantome
     if (meme_case(start, goal)) {
         return -1;
     }
+
+    //remplir les deux tableaux de noeuds vide
     for (int i = 0; i < array_max; ++i) {
         open_node[i] = (Node) {1};
         closed_node[i] = (Node) {1};
     }
 
+    //definition du premier noeud
     Node *start_node = &open_node[0];
     start_node->node_case = start;
     start_node->empty = 0;
@@ -65,21 +88,22 @@ direction path_init(Case *start, Partie *p, int avoid, Case *goal) {
     start_node->f_cost = start_node->h_cost;
     start_node->parent = NULL;
 
-
+    //reinitialisation des deux indexes
     closed_node_index = 0;
     open_node_index = 0;
 
 
     pathcode path = path_finder(p, avoid, goal);
 
+    //cas ou le chemin n'a pas ete trouve
     Node cur = closed_node[closed_node_index];
-    if (path == NO_PATH_FOUND) {
+    if (path == PATH_NOT_FOUND) {
         return -1;
     }
     int index, max_f_cost;
 
     switch (path) {
-        case NO_PATH_FOUND:
+        case PATH_NOT_FOUND:
             return -1;
         case PATH_MAX_ITER_REACHED:
             max_f_cost = cur.f_cost;
@@ -97,12 +121,13 @@ direction path_init(Case *start, Partie *p, int avoid, Case *goal) {
             break;
         case PATH_DISTANCE_REACHED:
         case PATH_FOUND:
+            //recherche la case voisine de la case de depart (n a pas de parent)
             while (cur.parent != NULL && !meme_case(cur.parent->node_case, start)) {
                 cur = *cur.parent;
             }
     }
 
-
+    //retourne la direction de la case de depart a la premiere case
     return dir_from_to(start, cur.node_case, p);
 }
 
@@ -213,14 +238,6 @@ pathcode path_finder(Partie *p, int avoid, Case *goal) {
 }
 
 
-int has_fantome(Case *target, Partie *p) {
-    int f = 0;
-    for (int i = 0; i < NBFANTOMES; ++i) {
-        if (meme_case(target, p->fantomes[i].case_fantome))f++;
-    }
-    return f;
-}
-
 void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal) {
 
     for (direction dir = DIR_HAUT; dir < DIR_GAUCHE + 1; ++dir) {
@@ -250,11 +267,13 @@ void check_neighbours(Node *parent, Partie *p, int avoid, Case *goal) {
 }
 
 int get_f_cost(int nodeI, Node *parent, Partie *partie, Case *goal) {
+    //retourne le scoe f (somme des scores g et h)
     Node *node = &open_node[nodeI];
     return get_g_cost(parent, partie, node) + manhattan_distance(node->node_case, goal, partie);
 }
 
 int get_cheapest_node() {
+    //recherche du voisin ayant le score F le plus petit
     int max_f_cost = open_node[open_node_index].f_cost;
     int index = -1;
 
@@ -270,6 +289,7 @@ int get_cheapest_node() {
 }
 
 int closed_node_in_case(Case *c) {
+    //retourne si le noeud de la case est ferme
     for (int i = 0; i < closed_node_index + 1; ++i) {
         if (!closed_node[i].empty && (closed_node[i].node_case->x == c->x && closed_node[i].node_case->y == c->y)) {
             return i;
@@ -279,6 +299,7 @@ int closed_node_in_case(Case *c) {
 }
 
 int open_node_in_case(Case *c) {
+    //retourne si le noeud de la case est ouvert
     for (int i = 0; i < open_node_index + 1; ++i) {
         if (!open_node[i].empty && (open_node[i].node_case->x == c->x && open_node[i].node_case->y == c->y)) {
             return i;
@@ -288,10 +309,12 @@ int open_node_in_case(Case *c) {
 }
 
 int get_g_cost(Node *parent, Partie *partie, Node *neightbour) {
+    //retourne le cout G d un noeud
     return parent->g_cost + 1;
 }
 
 void set_cost(Node *node, Node *parent, Partie *p, Case *goal) {
+    //attribut les couts H, G et F d un noeud
     node->g_cost = get_g_cost(parent, p, node);
 
     node->h_cost = manhattan_distance(node->node_case, goal, p);
@@ -308,6 +331,7 @@ int min(int a, int b) {
 // https://stackoverflow.com/questions/23580083/manhattan-distance-for-a-2d-toroid
 
 int manhattan_distance(const Case *aCase, const Case *b, const Partie *p) {
+    //calcule la distance manhattane tout en considerand le plan comme un torroid
     int walk_mhdx = abs(aCase->x - b->x);
     int walk_mhdy = abs(aCase->y - b->y);
 

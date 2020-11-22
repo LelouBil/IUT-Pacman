@@ -16,6 +16,7 @@
 static const int COLOR_FANTOMES[NBFANTOMES] = {red, pink, cyan, orange};
 
 //region Sizes
+//taille des entites
 #define SIZE_GOMME_BONUS ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.5)
 #define SIZE_GOMME_PAC ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.2)
 #define SIZE_FANTOME ((PLATEAU_BLOCK_TAILLE / 2.0) * 0.8)

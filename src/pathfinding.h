@@ -6,9 +6,9 @@
 #define array_max 100
 
 
-#define FLEE_MAX_PATH_ITER 150
+#define FLEE_MAX_PATH_ITER 150 //maximum de recursions de path finding avant de considere que le chemin est introvable
 
-#define FLEE_MAX_PATH_DISTANCE 20
+#define FLEE_MAX_PATH_DISTANCE 20 //pareil mais en terme de distance
 
 direction path_init(Case *start, Partie *p, int avoid, Case *goal);
 

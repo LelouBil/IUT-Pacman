@@ -11,10 +11,12 @@ extern int plateau_width, plateau_height;
 void dessiner_fantome_bleu(const Fantome *fantome);
 
 void remplir_case(const Case *c, int color) {
+    //remplie une case du plateau avec une couleur
     dessiner_rectangle(get_point(c), PLATEAU_BLOCK_TAILLE, PLATEAU_BLOCK_TAILLE, color);
 }
 
 void dessiner_fantome(const Fantome *f) {
+    //dessine un fantome (cercle de couleur) selon sa position
     dessiner_disque(to_point(f->position), SIZE_FANTOME, COLOR_FANTOMES[f->type]);
 }
 
@@ -24,17 +26,19 @@ void dessiner_pacman(const Pacman *p) {
 }
 
 void dessiner_gomme_pac(const Case *c) {
+    //dessine une pacgomme d'une case
     dessiner_disque(to_point(get_case_center(c)), SIZE_GOMME_PAC, COLOR_GOMME);
 }
 
 void dessiner_gomme_bonus(const Case *c) {
+    //dessine une super pac gomme d'une case
     dessiner_disque(to_point(get_case_center(c)), SIZE_GOMME_BONUS, COLOR_GOMME);
 }
 
 //endregion
 
 void dessiner_plateau(const Partie *p) {
-
+    //efface la fenetre puis desssine les case
     dessiner_rectangle((Point) {0, 0}, p->xmax * PLATEAU_BLOCK_TAILLE, p->ymax * PLATEAU_BLOCK_TAILLE, black);
 
     //Parcoure tout le tableau du plateau et dessine un rectangle pour chaque character '*'
@@ -50,7 +54,7 @@ void dessiner_plateau(const Partie *p) {
 
 
 void dessiner_case(const Case *c) {
-
+    //selone le type de la case donne, dessine un mur, une gomme, une super pac gomme, ou rien
     if (c->wall) {
         remplir_case(c, COLOR_WALL);
     } else {
@@ -59,20 +63,21 @@ void dessiner_case(const Case *c) {
         remplir_case(c, COLOR_BG);
 
 
-        switch (c->gomme) {
-            case GOMME_PAC:
+        switch (c->gomme) { //switch type de gomme de la case
+            case GOMME_PAC: //cas gomme
                 dessiner_gomme_pac(c);
                 break;
-            case GOMME_BONUS:
+            case GOMME_BONUS: //cas super pac gomme
                 dessiner_gomme_bonus(c);
                 break;
-            case GOMME_EMPTY:
+            case GOMME_EMPTY: //cas vide
                 break;
         }
     }
 }
 
 void dessiner_rect_cases(const Partie *p, int cx, int cy) {
+    //redessine le plateau autour d'une case, utilise lorsque pac man ou un fantome la traverse
     for (int x = cx - 1; x < cx + 2; ++x) {
         for (int y = cy - 1; y < cy + 2; ++y) {
             if (x >= 0 && x < p->xmax && y >= 0 && y < p->ymax) {
@@ -88,19 +93,23 @@ void dessiner_fantome_dead(const Fantome *fantome) {
 
 void dessiner_entities(Partie *partie) {
 
+    //nettoi la zone a cote de pacman
     dessiner_rect_cases(partie, partie->pacman.case_pacman->x, partie->pacman.case_pacman->y);
+
+    //nettoi la zone a cote des fantomes
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
         dessiner_rect_cases(partie, fantome->case_fantome->x, fantome->case_fantome->y);
     }
 
-
+    //dessine pac man
     dessiner_pacman(&partie->pacman);
 
+    //dessin les fantomes en fonction de leur etat
     for (int i = 0; i < NBFANTOMES; ++i) {
         const Fantome *fantome = &partie->fantomes[i];
-        if (fantome->alive) {
-            if (partie->bonus_timer > 0) {
+        if (fantome->alive) { //si le fantome n'a pas ete mange
+            if (partie->bonus_timer > 0) { //si le timer des super pac gomme n'est pas a 0
                 dessiner_fantome_bleu(fantome);
             } else {
                 dessiner_fantome(fantome);
@@ -112,6 +121,7 @@ void dessiner_entities(Partie *partie) {
 }
 
 void dessiner_fantome_bleu(const Fantome *fantome) {
+    //dessine un fantome bleu (mode panique)
     dessiner_disque(to_point(fantome->position), SIZE_FANTOME, bleumarine);
 }
 
@@ -120,31 +130,30 @@ const int vie_radius = 10;
 const int vie_padding = 5;
 
 void dessiner_vies(int vies, Couleur color) {
-
+    // TODO
     int ycent = plateau_height + ((window_height - plateau_height) / 2);
-
     Point center = {((window_height - plateau_height) / 2), ycent};
 
-    //Point center = {corner.x + vie_radius,corner.y + vie_radius};
-
+    //dessine les vies
     for (int i = 0; i < vies; ++i) {
         dessiner_disque(center, vie_radius, color);
 
         center.x += vie_radius * 2 + vie_padding;
     }
-
 }
 
 void dessiner_texte_niveau(Partie *partie) {
+    //dessine le texte en debut de niveau
     char texte[30];
     sprintf(texte, "Niveau %d", partie->level);
 
-    int padding = 5;
+    int padding = 5; //espace autour du texte
 
     Point taille = taille_texte(texte, 15);
 
     Point corner = {window_width - taille.x - padding, plateau_height + padding};
 
+    //dessine le fond du texte
     dessiner_rectangle((Point) {window_width - 30, plateau_height + 5}, 30, window_height - plateau_height, black);
 
     afficher_texte(texte, 15, corner, blue);
